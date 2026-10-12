@@ -1,50 +1,55 @@
-/* Runs every minute (UTC cron). Sends a push alert 10 minutes before each task
-   to every phone that turned alerts on, skipping tasks already ticked off. */
+/* Runs every minute (UTC cron). For every phone with alerts on: task alerts (lead time from its settings),
+   plus the 6:30 am and 11 pm summaries. Uses that phone's own edits / moved / added tasks. */
 import { getStore } from '@netlify/blobs';
 import webpush from 'web-push';
-import { dueTasks, payloadFor } from '../lib/reminders.mjs';
+import { dueTasks, payloadFor, planOf, settingsOf, summaryDue, summaryPayload, colomboDate, dedupeKey } from '../lib/reminders.mjs';
 import { getVapid, subject } from '../lib/vapid.mjs';
 
 export default async () => {
-  const due = dueTasks(Date.now());
-  if (!due.length) return;
-
+  const now = Date.now();
   const store = getStore({ name: 'push', consistency: 'strong' });
+  const { blobs } = await store.list({ prefix: 'subs/' });
+  if (!blobs.length) return;
   const v = await getVapid(store);
   webpush.setVapidDetails(subject(), v.publicKey, v.privateKey);
-  const { blobs } = await store.list({ prefix: 'subs/' });
+  const today = colomboDate(now);
 
   for (const { key } of blobs) {
     const id = key.slice('subs/'.length);
     const rec = await store.get(key, { type: 'json' });
     if (!rec || !rec.sub) continue;
+    const set = settingsOf(rec);
+    let PLAN;
+    try { PLAN = planOf(rec); } catch (e) { console.error('plan failed', id, e); continue; }
     const done = new Set(rec.done || []);
-    const sent = (await store.get(`sent/${id}`, { type: 'json' })) || [];
-    const sentSet = new Set(sent);
-    let changed = false;
+    const sentSet = new Set((await store.get(`sent/${id}`, { type: 'json' })) || []);
+    const jobs = [];
 
-    for (const item of due) {
-      const tid = item.task.id;
-      if (done.has(tid) || sentSet.has(tid)) continue;
+    for (const item of dueTasks(now, PLAN, set)) {
+      const dk = dedupeKey(item.task);
+      if (done.has(item.task.id) || sentSet.has(dk)) continue;
+      jobs.push({ dk, payload: payloadFor(item), ttl: 600 });
+    }
+    const kind = summaryDue(now, set);
+    if (kind) {
+      const dk = `sum:${kind}:${today}`;
+      if (!sentSet.has(dk)) jobs.push({ dk, payload: summaryPayload(kind, now, PLAN, rec), ttl: 3600 });
+    }
+
+    let changed = false;
+    for (const j of jobs) {
       try {
-        await webpush.sendNotification(rec.sub, JSON.stringify(payloadFor(item)), { TTL: 600, urgency: 'high' });
-        sentSet.add(tid);
-        changed = true;
+        await webpush.sendNotification(rec.sub, JSON.stringify(j.payload), { TTL: j.ttl, urgency: 'high' });
+        sentSet.add(j.dk); changed = true;
       } catch (err) {
         if (err && (err.statusCode === 404 || err.statusCode === 410)) {
-          // the phone unsubscribed or reinstalled: forget it
-          await store.delete(key);
-          await store.delete(`sent/${id}`);
-          changed = false;
-          break;
+          await store.delete(key); await store.delete(`sent/${id}`); changed = false; break; // phone gone
         }
         console.error('push failed', id, err && err.statusCode, err && err.body);
       }
     }
-    if (changed) await store.setJSON(`sent/${id}`, [...sentSet].slice(-400));
+    if (changed) await store.setJSON(`sent/${id}`, [...sentSet].slice(-500));
   }
 };
 
-export const config = {
-  schedule: '* * * * *', // every minute, UTC; the window logic handles Sri Lanka time
-};
+export const config = { schedule: '* * * * *' };

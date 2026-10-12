@@ -1,4 +1,4 @@
-/* Generated from the app plan builder — the same schedule the app shows. */
+/* Generated from the app plan builder (core.js) — the same schedule + edits logic the app uses. */
 const START='2026-10-12', END='2026-11-30';
 const SUBJ={
   sft:{n:'SFT',c:'var(--sft)',full:'Science for Technology'},
@@ -97,7 +97,7 @@ const HEX_SUN=[
 ];
 
 /* ---------- build plan ---------- */
-const PLAN={}, ORDER=[];
+const BASE={}, ORDER=[];
 (function build(){
   let sq=0,eq=0,tue=0,thu=0,sun=0,cls=0,dp=0;
   const OLDN={0:4,1:2,2:2,3:2,4:2,5:0,6:0};
@@ -173,10 +173,68 @@ const PLAN={}, ORDER=[];
     }
     L.forEach((t,i)=>{t.id=iso+'-'+i;t.date=iso;
       t.h=(t.t&&t.e&&t.ap)?(()=>{let a=mins(t.t,t.ap),b=mins(t.e,t.ap);if(b<a)b+=12*60;return (b-a)/60})():0;});
-    PLAN[iso]={iso,w,wk,tasks:L};ORDER.push(iso);
+    BASE[iso]={iso,w,wk,tasks:L};ORDER.push(iso);
   }
 })();
-const ALL=ORDER.flatMap(d=>PLAN[d].tasks);
-const CHECKABLE=ALL.filter(t=>!t.fx&&t.k!=='rest');
 
-export { PLAN, ORDER, SUBJ, KIND, START, END, mins, isoAdd };
+/* ---------- day label ---------- */
+function dayKey(d){return d===START?['පරණ වැඩ ඉවර කරන දවස','ict']:DAYTYPE[dow(d)]}
+
+/* ---------- time helpers (12-hour pieces <-> minutes) ---------- */
+const endMin=t=>{let a=mins(t.t,t.ap),b=mins(t.e,t.ap2||t.ap);if(b<=a)b+=720;return b};
+const startMin=t=>mins(t.t,t.ap);
+function toPieces(m){m=((m%1440)+1440)%1440;const h=Math.floor(m/60),mm=m%60,ap=h>=12?'pm':'am',h12=h%12===0?12:h%12;
+  return {t:h12+':'+String(mm).padStart(2,'0'),ap}}
+/* "HH:MM" 24h -> {t,ap} */
+function from24(v){const [h,m]=v.split(':').map(Number);return toPieces(h*60+m)}
+function to24(t,ap){const m=mins(t,ap);return String(Math.floor(m/60)).padStart(2,'0')+':'+String(m%60).padStart(2,'0')}
+function setSpan(o,a,b){const p=toPieces(a),q=toPieces(b);o.t=p.t;o.ap=p.ap;o.e=q.t;o.ap2=q.ap===p.ap?'':q.ap;return o}
+
+/* ---------- merged plan: base plan + the person's own changes ----------
+   st.edits[id] = {ti,d,date,t,e,ap,ap2}   changed title / day / time of a plan task
+   st.hidden[id] = 1                       a plan task the person removed
+   st.custom = [{id,date,s,ti,d,t,e,ap,ap2,k}]   tasks the person added                          */
+function makePlan(st){
+  st=st||{};const ed=st.edits||{},hid=st.hidden||{},cu=st.custom||[];
+  const P={};ORDER.forEach(d=>{P[d]={iso:d,w:BASE[d].w,wk:BASE[d].wk,tasks:[]}});
+  const put=t=>{if(P[t.date])P[t.date].tasks.push(t)};
+  ORDER.forEach(d=>BASE[d].tasks.forEach(b=>{
+    if(hid[b.id])return;
+    const t=Object.assign({},b,{home:d}),e=ed[b.id];
+    if(e){for(const k of ['ti','d','date','t','e','ap','ap2'])if(e[k]!==undefined)t[k]=e[k];
+      if((e.date&&e.date!==d)||(e.t&&(e.t!==b.t||e.ap!==b.ap)))t.mv=1;
+      if(e.ti!==undefined||e.d!==undefined)t.ed=1}
+    put(t)}));
+  cu.forEach(c=>{if(!hid[c.id])put(Object.assign({k:'now',cu:1,home:c.date},c))});
+  ORDER.forEach(d=>{const L=P[d].tasks;
+    L.forEach((t,i)=>{t._i=i});
+    if(L.every(t=>t.ap&&t.e))L.sort((a,b)=>startMin(a)-startMin(b)||a._i-b._i);
+    L.forEach((t,i)=>{t.id=t.id;t.date=d;
+      t.h=(t.t&&t.e&&t.ap)?(endMin(t)-startMin(t))/60:0;t.clash=0;delete t._i});
+    const T=L.filter(t=>t.ap&&t.e&&t.k!=='rest');
+    for(let i=0;i<T.length;i++)for(let j=i+1;j<T.length;j++)if(startMin(T[j])<endMin(T[i])&&startMin(T[i])<endMin(T[j])){T[i].clash=1;T[j].clash=1}
+  });
+  const ALL=ORDER.flatMap(d=>P[d].tasks);
+  return {PLAN:P,ALL,CHECKABLE:ALL.filter(t=>!t.fx&&t.k!=='rest')};
+}
+
+/* ---------- streak + daily completion ----------
+   A day "counts" when at least 60% of its tickable tasks are done. */
+const STREAK_PCT=0.6;
+function dayStat(P,iso,done){const L=P[iso].tasks.filter(t=>!t.fx&&t.k!=='rest');const a=L.filter(t=>done[t.id]).length;
+  return {iso,n:L.length,a,p:L.length?a/L.length:0,ok:L.length>0&&a/L.length>=STREAK_PCT}}
+function streakInfo(P,done,today){
+  const last=today<START?START:today>END?END:today;let cur=0,best=0,run=0;
+  for(let d=START;d<=last;d=isoAdd(d,1)){const s=dayStat(P,d,done);
+    if(s.ok){run++;if(run>best)best=run}else if(d!==last){run=0}else{/* today not finished yet: keep the run alive */}}
+  // current streak: walk back from today (today may still be in progress)
+  let d=last;if(!dayStat(P,d,done).ok)d=isoAdd(d,-1);
+  while(d>=START&&dayStat(P,d,done).ok){cur++;d=isoAdd(d,-1)}
+  return {cur,best:Math.max(best,cur),todayOk:dayStat(P,last,done).ok}
+}
+
+/* the plan the app starts with */
+let PLAN=BASE,ALL=ORDER.flatMap(d=>BASE[d].tasks),CHECKABLE=ALL.filter(t=>!t.fx&&t.k!=='rest');
+function applyPlan(st){const r=makePlan(st);PLAN=r.PLAN;ALL=r.ALL;CHECKABLE=r.CHECKABLE}
+
+export { makePlan, BASE, ORDER, SUBJ, KIND, START, END, mins, isoAdd, dow, dayKey, dayStat, streakInfo, startMin, endMin };

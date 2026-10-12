@@ -38,8 +38,20 @@ export default async (req) => {
     const existing = (await store.get(key, { type: 'json' })) || {};
     const sub = body.subscription || existing.sub;
     if (!sub || !sub.keys) return json({ error: 'මේ phone එකට alerts on කරලා නෑ.' }, 404);
-    const done = Array.isArray(body.done) ? body.done.filter(x => typeof x === 'string').slice(0, 2000) : (existing.done || []);
-    await store.setJSON(key, { sub, done, updated: Date.now() });
+    const c = body.cfg && typeof body.cfg === 'object' ? body.cfg : {};
+    const strs = a => Array.isArray(a) ? a.filter(x => typeof x === 'string').slice(0, 3000) : null;
+    const obj = o => (o && typeof o === 'object' && !Array.isArray(o)) ? o : null;
+    const lim = (v, fallback) => (v !== null && JSON.stringify(v).length < 120000) ? v : fallback;
+    const done = strs(c.done) || strs(body.done) || existing.done || [];
+    const rec = {
+      sub, done, updated: Date.now(),
+      edits: lim(obj(c.edits), existing.edits || {}),
+      hidden: lim(obj(c.hidden), existing.hidden || {}),
+      custom: lim(Array.isArray(c.custom) ? c.custom : null, existing.custom || []),
+      settings: lim(obj(c.settings), existing.settings || {}),
+      qs: Array.isArray(c.qs) ? c.qs.slice(0, 200).map(q => ({ s: String(q && q.s || '') })) : (existing.qs || []),
+    };
+    await store.setJSON(key, rec);
 
     if (body.test) {
       const v = await getVapid(store);
@@ -47,7 +59,7 @@ export default async (req) => {
       try {
         await webpush.sendNotification(sub, JSON.stringify({
           title: 'Nima Schedule alerts on ✓',
-          body: 'හැම වැඩකටම විනාඩි 10කට කලින් මෙහෙම alert එකක් එනවා.',
+          body: `හැම වැඩකටම විනාඩි ${(rec.settings && rec.settings.lead) || 10}කට කලින් මෙහෙම alert එකක් එනවා.`,
           tag: 'nima-test',
           url: '/',
         }), { TTL: 300, urgency: 'high' });
