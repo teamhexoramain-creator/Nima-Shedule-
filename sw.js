@@ -1,5 +1,5 @@
 /* Nima Schedule service worker: app works offline, updates in the background */
-const VERSION = 'nima-v1';
+const VERSION = 'nima-v2';
 const SHELL = ['./', './index.html', './manifest.webmanifest', './icons/icon.svg', './icons/icon-192.png', './icons/icon-512.png', './icons/maskable-512.png', './icons/apple-touch-icon.png', './icons/favicon-32.png'];
 
 self.addEventListener('install', e => {
