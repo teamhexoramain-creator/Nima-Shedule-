@@ -4,7 +4,7 @@ import { makePlan, SUBJ, KIND, ORDER, START, END, isoAdd, mins, dayKey, dayStat,
 const OFFSET_MS = 5.5 * 60 * 60 * 1000; // Sri Lanka (UTC+05:30, no DST)
 export const DEFAULTS = { lead: 10, cls: false, rest: false, am: true, pm: true };
 export const AM_MIN = 6 * 60 + 30;   // 6:30 morning summary
-export const PM_MIN = 23 * 60;       // 11:00 pm night summary
+export const PM_MIN = 23 * 60 + 45;  // 11:45 pm night summary (sleeps ~1:30)
 
 export const colomboDate = nowMs => new Date(nowMs + OFFSET_MS).toISOString().slice(0, 10);
 export const colomboMin = nowMs => { const d = new Date(nowMs + OFFSET_MS); return d.getUTCHours() * 60 + d.getUTCMinutes(); };
@@ -47,7 +47,7 @@ export function summaryDue(nowMs, set) {
   set = Object.assign({}, DEFAULTS, set || {});
   const m = colomboMin(nowMs);
   if (set.am && m >= AM_MIN && m < AM_MIN + 90) return 'am';
-  if (set.pm && m >= PM_MIN && m < PM_MIN + 55) return 'pm';
+  if (set.pm && m >= PM_MIN && m < 24 * 60) return 'pm';
   return null;
 }
 const hrs = h => `${Math.round(h * 2) / 2}`;

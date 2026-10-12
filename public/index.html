@@ -792,6 +792,11 @@ input[type=time].inp,input[type=date].inp{font-family:var(--f-mono);min-height:4
 .btn{white-space:nowrap}
 .skr .to{text-align:right;white-space:normal;max-width:120px}
 
+.tk:active{transform:scale(.99)}
+.wday:active,.bcard:active{transform:scale(.995)}
+.mini{transition:background .3s}.mini:active{background:var(--surface-2)}
+details.missed .tl{animation:rise .5s var(--ease) both}
+
 </style>
 <style>
 html,body{margin:0}
@@ -997,14 +1002,14 @@ const BASE={}, ORDER=[];
       const b=Math.min(cls+n,27);cls=b;const c=b-a+1;
       return P({s:'ict',k:'old',bl:1,t,e,ap:'pm',mc:{c},ti:'පරණ class MCQ papers '+(a===b?'#'+a:'#'+a+'–#'+b),d:'ප්‍රශ්න '+(c*7)+'ක්. ප්‍රශ්නයට විනාඩි 1ක් වගේ. වැරදුණු / අනුමාන කරපු ඒවට විතරක් විවරණය.'})};
     const daily=(late)=>{
-      if(late){P({s:'ict',k:'daily',t:'11:10',e:'11:30',ap:'pm',ti:'රෑ 10 ICT paper + විවරණය',d:'Diploma පන්තිය නිසා අද පරක්කුයි. අද paper එක විතරක්. Daily quiz app එකට දාන්න.'});return}
-      P({s:'ict',k:'daily',t:'10:00',e:'10:30',ap:'pm',ti:'රෑ 10 ICT paper + විවරණය',d:'ප්‍රශ්න 5. වැරදුණු/අනුමාන ප්‍රශ්න වලට විතරක් විවරණය. ඒකම Daily quiz app එකට දාන්න.'});
+      if(late){P({s:'ict',k:'daily',t:'11:10',e:'11:30',ap:'pm',ti:'රෑ 10 Day paper (Daily quiz) + විවරණය',d:'Diploma පන්තිය නිසා අද පරක්කුයි. අද paper එක විතරක්. Daily quiz app එකට දාන්න.'});return}
+      P({s:'ict',k:'daily',t:'10:00',e:'10:30',ap:'pm',ti:'රෑ 10 Day paper (Daily quiz) + විවරණය',d:'ප්‍රශ්න 5. වැරදුණු/අනුමාන ප්‍රශ්න වලට විතරක් විවරණය. ඒකම Daily quiz app එකට දාන්න.'});
       const n=OLDN[w];if(n&&dp<72){const a=dp+1,b=Math.min(dp+n,72);dp=b;const c=b-a+1;
-        P({s:'ict',k:'old',bl:1,mc:{d:c},t:'10:30',e:c>2?'11:15':'10:55',ap:'pm',ti:'පරණ Day papers '+(a===b?'#'+a:'#'+a+'–#'+b),d:'ප්‍රශ්න '+(c*5)+'ක්. විවරණය ලියලා Day papers app එකට දාන්න.'})}
+        P({s:'ict',k:'old',bl:1,mc:{d:c},t:'10:30',e:c>2?'11:15':'10:55',ap:'pm',ti:'පරණ Day papers (Daily quiz) '+(a===b?'#'+a:'#'+a+'–#'+b),d:'ප්‍රශ්න '+(c*5)+'ක්. විවරණය ලියලා Daily quiz (Day papers) app එකට දාන්න.'})}
     };
     if(iso===START){
       P({s:'ict',k:'old',t:'අද',e:'',ap:'',ti:'IT class past papers book එක ඉවර කරන්න',d:'අද මේක ඉවර කරලා හෙට (ඔක් 13) ඉඳන් plan එක පටන් ගන්න.'});
-      P({s:'ict',k:'rev',t:'රෑ',e:'',ap:'',ti:'හෙට ICT පන්තියට ලෑස්ති වෙන්න',d:'හෙට ඉඳන් රෑ 10 paper එක හැමදාම කරනවා. Daily quiz app එක ලෑස්ති කරගන්න.'});
+      P({s:'ict',k:'rev',t:'රෑ',e:'',ap:'',ti:'හෙට ICT පන්තියට ලෑස්ති වෙන්න',d:'හෙට ඉඳන් රෑ 10 Day paper (Daily quiz) එක හැමදාම කරනවා. Daily quiz app එක ලෑස්ති කරගන්න.'});
     } else if(w===1||w===5){ // SFT
       const it=SFT_Q[sq++]||SFT_Q[SFT_Q.length-1];
       Q(it[0],'sft','3:30','5:30','pm');
@@ -1346,7 +1351,7 @@ function viewProgress(){
   const gi={sft:'old',et:'old',ict:'daily',dip:'cls',asg:'now',hex:'now'};
   const cards=groups.map((g,i)=>{const S=SUBJ[g];const items=ALL.filter(t=>t.s===g&&t.bl&&!t.mc);
     const meters=g==='ict'?`<div class="meter"><span>පරණ class MCQ papers</span><span class="mono" data-frac="mcqc">0/27</span><span class="gbar"><i data-bar="mcqc" style="width:0"></i></span>
-      <span>පරණ Day papers</span><span class="mono" data-frac="mcqd">0/72</span><span class="gbar"><i data-bar="mcqd" style="width:0"></i></span></div>`:'';
+      <span>පරණ Day papers (Daily quiz)</span><span class="mono" data-frac="mcqd">0/72</span><span class="gbar"><i data-bar="mcqd" style="width:0"></i></span></div>`:'';
     return `<section class="card bcard stag" style="--i:${i+3};--c:${S.c};--c2:${S.c2}">
       <div class="bhead"><span class="ico">${IC[gi[g]]}</span><div><h3>${S.n}</h3><small>${sub[g]}</small></div>${ringSVG('subj:'+g,'sm',S.c)}</div>
       ${meters}${items.map(t=>{const dn=!!state.done[t.id],late=!dn&&t.date<TODAY;return `<div class="bitem ${dn?'done':''}" data-tid="${t.id}">
@@ -1383,7 +1388,7 @@ function viewRules(){
       <li><b>දවසට එක subject එකයි.</b><span>සඳු සහ සිකු SFT, අඟහරුවාදා සහ බ්‍රහස්පතින්දා ICT, බදාදා ET. සෙනසුරාදා පන්ති දවස. ඉරිදා Diploma, assignments, Hexora.</span></li>
       <li><b>පළමු block එක පරණ වැඩ, දෙවැන්න දැන් යන වැඩ.</b><span>පරණ වැඩ ඉවර වෙනකන් හැම subject දවසකම මුල් පැය 2 පරණ වැඩ වලට.</span></li>
       <li><b>පන්තියේ දේ එදාම.</b><span>සෙනසුරාදා හවස ET/SFT notes, අඟහරුවාදා රෑ ICT class paper සහ notes. මේක කළොත් අලුත් backlog එකක් හැදෙන්නේ නෑ.</span></li>
-      <li><b>රෑ 10 ICT paper එක කවදාවත් මඟ අරින්න එපා.</b><span>විනාඩි 30යි. ඒ ප්‍රශ්නයි විවරණයයි තමා ICT apps වල content එක.</span></li>
+      <li><b>රෑ 10 Day paper (Daily quiz) එක කවදාවත් මඟ අරින්න එපා.</b><span>විනාඩි 30යි. ඒ ප්‍රශ්නයි විවරණයයි තමා ICT apps වල content එක.</span></li>
       <li><b>වැඩක් මඟ ඇරුණොත්.</b><span>ඉරිදා 7:30 review එකේ කරන්න. එකම subject එකේ මඟ ඇරුණු වැඩ 2කට වඩා එකතු වුණොත්, ඊළඟ ඒ subject දවසේ "දැන් යන" block එකෙන් බාගයක් පරණ වැඩට දෙන්න.</span></li>
     </ol></section>
     <section class="card stag" style="--i:1"><h3>පරණ වැඩ නැතුව අලුත් එක කරන්න බැරි තැන්</h3><div class="dep">
@@ -1443,6 +1448,7 @@ function setTabUI(){const n=TABS.findIndex(t=>t[0]===ui.tab);
   document.getElementById('ttl').textContent=TABS[n][1];
   document.getElementById('tsub').textContent=SUBTXT[ui.tab];}
 function render(keepAnim,dir){
+  const before=keepAnim?snapRects():null;
   setTabUI();
   const v=document.getElementById('view');
   v.innerHTML=ui.tab==='today'?viewToday():ui.tab==='week'?viewWeek():ui.tab==='progress'?viewProgress():ui.tab==='tools'?viewTools():viewRules();
@@ -1451,7 +1457,16 @@ function render(keepAnim,dir){
   else v.querySelectorAll('.stag').forEach(e=>e.style.animation='none');
   applySkin();
   requestAnimationFrame(()=>requestAnimationFrame(()=>{refresh();setupReveal()}));
+  if(before)playFlip(before);
 }
+/* FLIP: anything that moves or appears after a change glides/pops instead of jumping */
+const FLIPSEL='#view [data-tid],#view [data-qid],#view .wday,#view .bcard,#view .tcard,#view .qcard,#view .dl,#view .rest';
+const flipKey=el=>(el.dataset.tid||el.dataset.qid||'')+'|'+el.className.split(' ')[0]+'|'+(el.dataset.open||'');
+function snapRects(){const m=new Map();document.querySelectorAll(FLIPSEL).forEach(el=>{const r=el.getBoundingClientRect();const k=flipKey(el);if(!m.has(k))m.set(k,{x:r.left,y:r.top})});return m}
+function playFlip(before){if(reduced()||!before.size)return;const seen=new Set();
+  document.querySelectorAll(FLIPSEL).forEach(el=>{const k=flipKey(el);if(seen.has(k))return;seen.add(k);const r=el.getBoundingClientRect(),o=before.get(k);if(el.animate===undefined)return;
+    if(o){const dx=o.x-r.left,dy=o.y-r.top;if(Math.abs(dx)>2||Math.abs(dy)>2)el.animate([{transform:`translate(${dx}px,${dy}px)`},{transform:'none'}],{duration:520,easing:'cubic-bezier(.22,1,.36,1)'})}
+    else if(r.top<innerHeight&&r.bottom>0)el.animate([{opacity:0,transform:'translateY(14px) scale(.96)'},{opacity:1,transform:'none'}],{duration:480,easing:'cubic-bezier(.175,.885,.32,1.275)'})})}
 const tabIdx=k=>TABS.findIndex(t=>t[0]===k);
 function go(tab){if(tab===ui.tab)return;const dir=Math.sign(tabIdx(tab)-tabIdx(ui.tab));ui.tab=tab;saveUi();render(false,dir);
   const tt=document.getElementById('ttl');tt.classList.remove('swap');void tt.offsetWidth;tt.classList.add('swap');
@@ -1569,7 +1584,7 @@ function highlight(id){requestAnimationFrame(()=>{const el=document.querySelecto
 
 /* ---------- scheduling helpers ---------- */
 function gapIn(date,dur,P){P=P||PLAN;const busy=P[date].tasks.filter(t=>t.ap&&t.e).map(t=>[startMin(t),endMin(t)]).sort((x,y)=>x[0]-y[0]);
-  const w=dow(date);let cur=(w===0||w===6)?420:930;const hi=23*60+30;
+  const w=dow(date);let cur=(w===0||w===6)?420:930;const hi=23*60+55;
   if(date===TODAY)cur=Math.max(cur,Math.ceil((nowMins()+10)/15)*15);
   for(const [a,b] of busy){if(b<=cur)continue;if(a-cur>=dur)return {a:cur,b:cur+dur,ok:1};cur=Math.max(cur,b)}
   if(hi-cur>=dur)return {a:cur,b:cur+dur,ok:1};
@@ -1948,7 +1963,7 @@ function viewTools(){
     <div class="setrow"><div><b>පන්ති විතරක්</b><small>Class එකට විතරක් alert. අනිත් වැඩ වලට නෑ.</small></div>${toggleHTML('cls',st.cls)}</div>
     <div class="setrow"><div><b>විවේක / කෑම වෙලාවටත්</b><small>Off නම් විවේක වෙලාවට alert එන්නේ නෑ.</small></div>${toggleHTML('rest',st.rest)}</div>
     <div class="setrow"><div><b>උදේ 6:30 summary</b><small>අද දවසේ වැඩ, පළමු වැඩේ, streak.</small></div>${toggleHTML('am',st.am)}</div>
-    <div class="setrow"><div><b>රෑ 11:00 summary</b><small>අද ඉවර කළ ගාන සහ හෙට පළමු වැඩේ.</small></div>${toggleHTML('pm',st.pm)}</div></section>`;
+    <div class="setrow"><div><b>රෑ 11:45 summary</b><small>අද ඉවර කළ ගාන සහ හෙට පළමු වැඩේ.</small></div>${toggleHTML('pm',st.pm)}</div></section>`;
   const icsCard=`<section class="card tcard stag" style="--i:5;--c:var(--et);--c2:var(--et2)"><div class="th"><span class="ico" style="--c:var(--et);--c2:var(--et2)">${IC.cal}</span><div><h3>Calendar එකට</h3><small>Google Calendar / Apple / Outlook</small></div></div>
     <div class="fld"><label>මොන කාලයද?</label>${segHTML([['week','මේ සතිය'],['rest','ඉතුරු plan එක'],['all','ඔක්කොම']],ICS.range==='rest'?'rest':ICS.range,'icsr')}</div>
     <div class="setrow"><div><b>ඉවර කරපු ඒවා නැතිව</b><small>Tick කරපු වැඩ file එකට දාන්නේ නෑ.</small></div>${toggleHTML('icsd',ICS.hideDone)}</div>
