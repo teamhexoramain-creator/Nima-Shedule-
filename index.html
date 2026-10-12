@@ -1,0 +1,1100 @@
+<!doctype html>
+<html lang="si">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Nima Schedule</title>
+<meta name="description" content="ඔක් 12 සිට නොවැ 30 වෙනකන් A/L, Diploma සහ Hexora වැඩ balance කරන plan එක.">
+<meta name="theme-color" content="#0A0C1C">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Nima Schedule">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icons/icon.svg" type="image/svg+xml">
+<link rel="icon" href="icons/favicon-32.png" sizes="32x32" type="image/png">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,800&text=NimaSchedule&display=swap">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<style>
+/* Layout: app shell — dark curved-tab sidebar (desktop) / bump bottom-nav (phone), glow task cards coloured by subject, three skins */
+:root{
+  --bg:#EDEFF7; --surface:#FFFFFF; --surface-2:#E6E9F3; --line:#D8DCEA; --fg:#141836; --muted:#5C6383;
+  --accent:#4F5BFF; --accent2:#8B5CF6;
+  --side:#141838; --side-fg:#C7CBEA; --side-mute:#7D84AF; --side-hover:rgb(255 255 255 / .07);
+  --neo-bg:#E4E7F0; --neo-dark:rgb(163 170 196 / .75); --neo-light:rgb(255 255 255 / .95); --neo-hole:#B9BFD3;
+  --shadow:0 14px 34px -18px rgb(20 24 60 / .35);
+  --sft:#D97706; --sft2:#F97316; --et:#0D9488; --et2:#06B6D4; --ict:#2563EB; --ict2:#6366F1;
+  --dip:#DB2777; --dip2:#F43F5E; --hex:#7C3AED; --hex2:#A855F7; --asg:#EA580C; --asg2:#EF4444;
+  --rev:#64748B; --rev2:#94A3B8; --mix:#4F5BFF; --mix2:#8B5CF6;
+  --ok:#16A34A; --ok2:#22C55E; --warn:#DC2626;
+  --f-display:"Bricolage Grotesque","Noto Sans Sinhala",system-ui,sans-serif;
+  --f-body:"Noto Sans Sinhala",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --f-mono:ui-monospace,"SF Mono","Cascadia Mono","Roboto Mono",Menlo,Consolas,monospace;
+  --spring:cubic-bezier(.175,.885,.32,1.275); --ease:cubic-bezier(.22,1,.36,1);
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#0E1120; --surface:#161A2E; --surface-2:#1D2240; --line:#272D4D; --fg:#E9EBF7; --muted:#9AA1C3;
+  --accent:#8C96FF; --accent2:#C084FC;
+  --side:#070914; --side-fg:#C7CBEA; --side-mute:#6F76A0; --side-hover:rgb(255 255 255 / .06);
+  --neo-bg:#1A1E33; --neo-dark:rgb(0 0 0 / .6); --neo-light:rgb(255 255 255 / .06); --neo-hole:#0B0D18;
+  --shadow:0 18px 40px -20px rgb(0 0 0 / .8);
+  --sft:#FBBF24; --sft2:#FB923C; --et:#2DD4BF; --et2:#22D3EE; --ict:#60A5FA; --ict2:#818CF8;
+  --dip:#F472B6; --dip2:#FB7185; --hex:#A78BFA; --hex2:#C084FC; --asg:#FB923C; --asg2:#F87171;
+  --rev:#94A3B8; --rev2:#CBD5E1; --mix:#8C96FF; --mix2:#C084FC; --ok:#22C55E; --ok2:#4ADE80; --warn:#F87171;
+  color-scheme:dark;
+}}
+:root[data-theme="dark"]{
+  --bg:#0E1120; --surface:#161A2E; --surface-2:#1D2240; --line:#272D4D; --fg:#E9EBF7; --muted:#9AA1C3;
+  --accent:#8C96FF; --accent2:#C084FC;
+  --side:#070914; --side-fg:#C7CBEA; --side-mute:#6F76A0; --side-hover:rgb(255 255 255 / .06);
+  --neo-bg:#1A1E33; --neo-dark:rgb(0 0 0 / .6); --neo-light:rgb(255 255 255 / .06); --neo-hole:#0B0D18;
+  --shadow:0 18px 40px -20px rgb(0 0 0 / .8);
+  --sft:#FBBF24; --sft2:#FB923C; --et:#2DD4BF; --et2:#22D3EE; --ict:#60A5FA; --ict2:#818CF8;
+  --dip:#F472B6; --dip2:#FB7185; --hex:#A78BFA; --hex2:#C084FC; --asg:#FB923C; --asg2:#F87171;
+  --rev:#94A3B8; --rev2:#CBD5E1; --mix:#8C96FF; --mix2:#C084FC; --ok:#22C55E; --ok2:#4ADE80; --warn:#F87171;
+  color-scheme:dark;
+}
+/* the page's own skin switch (Light / Dark / Black) wins over the host theme */
+:root[data-skin="light"]{
+  --bg:#EDEFF7; --surface:#FFFFFF; --surface-2:#E6E9F3; --line:#D8DCEA; --fg:#141836; --muted:#5C6383;
+  --accent:#4F5BFF; --accent2:#8B5CF6;
+  --side:#141838; --side-fg:#C7CBEA; --side-mute:#7D84AF; --side-hover:rgb(255 255 255 / .07);
+  --neo-bg:#E4E7F0; --neo-dark:rgb(163 170 196 / .75); --neo-light:rgb(255 255 255 / .95); --neo-hole:#B9BFD3;
+  --shadow:0 14px 34px -18px rgb(20 24 60 / .35);
+  --sft:#D97706; --sft2:#F97316; --et:#0D9488; --et2:#06B6D4; --ict:#2563EB; --ict2:#6366F1;
+  --dip:#DB2777; --dip2:#F43F5E; --hex:#7C3AED; --hex2:#A855F7; --asg:#EA580C; --asg2:#EF4444;
+  --rev:#64748B; --rev2:#94A3B8; --mix:#4F5BFF; --mix2:#8B5CF6; --ok:#16A34A; --ok2:#22C55E; --warn:#DC2626;
+  color-scheme:light;
+}
+:root[data-skin="dark"],:root[data-skin="black"]{
+  --bg:#0E1120; --surface:#161A2E; --surface-2:#1D2240; --line:#272D4D; --fg:#E9EBF7; --muted:#9AA1C3;
+  --accent:#8C96FF; --accent2:#C084FC;
+  --side:#070914; --side-fg:#C7CBEA; --side-mute:#6F76A0; --side-hover:rgb(255 255 255 / .06);
+  --neo-bg:#1A1E33; --neo-dark:rgb(0 0 0 / .6); --neo-light:rgb(255 255 255 / .06); --neo-hole:#0B0D18;
+  --shadow:0 18px 40px -20px rgb(0 0 0 / .8);
+  --sft:#FBBF24; --sft2:#FB923C; --et:#2DD4BF; --et2:#22D3EE; --ict:#60A5FA; --ict2:#818CF8;
+  --dip:#F472B6; --dip2:#FB7185; --hex:#A78BFA; --hex2:#C084FC; --asg:#FB923C; --asg2:#F87171;
+  --rev:#94A3B8; --rev2:#CBD5E1; --mix:#8C96FF; --mix2:#C084FC; --ok:#22C55E; --ok2:#4ADE80; --warn:#F87171;
+  color-scheme:dark;
+}
+:root[data-skin="black"]{
+  --bg:#000000; --surface:#0B0B11; --surface-2:#15151D; --line:#22222C; --muted:#8E8EA6;
+  --side:#111118; --neo-bg:#101016; --neo-hole:#000;
+}
+
+*{box-sizing:border-box}
+html,body{background:var(--bg)}
+body{color:var(--fg);font-family:var(--f-body);font-size:15px;line-height:1.6;-webkit-font-smoothing:antialiased;transition:background-color .4s,color .4s}
+button{font:inherit;color:inherit;cursor:pointer;background:none;border:0;padding:0}
+button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+svg{display:block}
+.mono{font-family:var(--f-mono);font-variant-numeric:tabular-nums}
+
+/* ---------- splash ---------- */
+.splash{position:fixed;inset:0;z-index:200;display:grid;place-items:center;color:#fff;overflow:hidden;cursor:pointer;
+  background:radial-gradient(60% 45% at 50% 42%,color-mix(in srgb,var(--accent) 28%,transparent),transparent 70%),radial-gradient(40% 35% at 70% 70%,color-mix(in srgb,var(--accent2) 22%,transparent),transparent 70%),#0A0C1C;
+  animation:spOut .75s 2.25s var(--ease) forwards}
+.splash.skip{animation:spOut .45s var(--ease) forwards}
+@keyframes spOut{to{opacity:0;transform:scale(1.08);visibility:hidden;pointer-events:none}}
+.sp-in{display:grid;justify-items:center;gap:14px;text-align:center;padding:0 16px}
+.sp-ring{position:relative;width:132px;height:132px;display:grid;place-items:center}
+.sp-ring::before{content:"";position:absolute;inset:0;border-radius:50%;border:1.5px solid rgb(255 255 255 / .12);border-top-color:var(--accent2);animation:spin 1.4s linear infinite, fadeIn .4s both}
+.sp-ring::after{content:"";position:absolute;inset:-14px;border-radius:50%;background:radial-gradient(circle,color-mix(in srgb,var(--accent) 45%,transparent),transparent 65%);animation:breathe 2.2s ease-in-out infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes fadeIn{from{opacity:0}}
+@keyframes breathe{50%{transform:scale(1.15);opacity:.6}}
+.sp-logo{position:relative;z-index:1;width:92px;height:92px;filter:drop-shadow(0 14px 28px rgb(0 0 0 / .45));animation:logoPop .9s var(--spring) both}
+@keyframes logoPop{from{opacity:0;transform:scale(.2) rotate(-35deg)}to{opacity:1;transform:none}}
+.sp-logo .lg-cal{stroke-dasharray:240;stroke-dashoffset:240;animation:draw .9s .35s var(--ease) forwards}
+.sp-logo .lg-chk{stroke-dasharray:40;stroke-dashoffset:40;animation:draw .5s 1.05s var(--ease) forwards}
+.sp-logo .lg-dot{transform-origin:48px 48px;animation:dotIn .5s 1.2s var(--spring) both, orbit 3s 1.7s linear infinite}
+@keyframes draw{to{stroke-dashoffset:0}}
+@keyframes dotIn{from{opacity:0;transform:scale(0)}}
+@keyframes orbit{to{transform:rotate(360deg)}}
+.sp-name{margin:6px 0 0;font-family:"Bricolage Grotesque",var(--f-display);font-weight:800;font-size:clamp(38px,9vw,64px);line-height:1;letter-spacing:-.02em;perspective:600px;white-space:nowrap}
+.sp-name span{display:inline-block;animation:letter .7s var(--spring) both;animation-delay:calc(.6s + var(--i) * 55ms)}
+.sp-name .g{background:linear-gradient(100deg,#C7CBFF,var(--accent2) 60%,#F9A8D4);-webkit-background-clip:text;background-clip:text;color:transparent}
+.sp-name .sp{width:.28em}
+@keyframes letter{from{opacity:0;transform:translateY(46px) rotateX(-85deg) scale(.8);filter:blur(6px)}to{opacity:1;transform:none;filter:none}}
+.sp-tag{margin:0;font-family:var(--f-mono);font-size:12px;letter-spacing:.16em;text-transform:uppercase;color:#AEB4DA;animation:rise .6s 1.45s var(--ease) both}
+.sp-bar{width:150px;height:3px;border-radius:3px;background:rgb(255 255 255 / .1);overflow:hidden;animation:fadeIn .4s 1.5s both}
+.sp-bar i{display:block;height:100%;width:100%;border-radius:3px;background:linear-gradient(90deg,var(--accent),var(--accent2),#F9A8D4);transform-origin:left;animation:fill 1.2s 1.1s var(--ease) both}
+@keyframes fill{from{transform:scaleX(0)}to{transform:scaleX(1)}}
+.sp-skip{position:absolute;bottom:calc(28px + env(safe-area-inset-bottom,0px));font-size:11.5px;color:rgb(255 255 255 / .4);animation:fadeIn .6s 1.6s both}
+.mark.logo{background:none;box-shadow:none;padding:0}
+.mark.logo svg{width:100%;height:100%;filter:drop-shadow(0 8px 16px color-mix(in srgb,var(--accent) 45%,transparent))}
+.brand .mark.logo{transition:transform .6s var(--spring)}
+.brand:hover .mark.logo{transform:rotate(-8deg) scale(1.06)}
+.brand .lg-dot,.top .lg-dot{transform-origin:48px 48px;animation:orbit 6s linear infinite}
+
+/* ---------- shell ---------- */
+.app{--sw:252px;display:grid;grid-template-columns:var(--sw) minmax(0,1fr);min-height:100vh;transition:grid-template-columns .55s var(--ease)}
+.app[data-collapsed="true"]{--sw:88px}
+.side{position:sticky;top:0;height:100vh;background:var(--side);color:var(--side-fg);display:flex;flex-direction:column;padding:22px 0 18px 16px;z-index:30;transition:background-color .4s}
+.brand{display:flex;align-items:center;gap:12px;padding:0 16px 0 6px;margin-bottom:28px;min-height:44px;white-space:nowrap}
+.brand .fade{overflow:hidden;min-width:0}
+.mark{width:42px;height:42px;flex:0 0 auto;border-radius:13px;display:grid;place-items:center;font-family:var(--f-display);font-weight:800;font-size:20px;color:#fff;
+  background:linear-gradient(135deg,var(--accent),var(--accent2));box-shadow:0 8px 22px -6px color-mix(in srgb,var(--accent) 70%,transparent)}
+.brand b{display:block;font-family:var(--f-display);font-size:19px;color:#fff;line-height:1.1}
+.brand small{font-family:var(--f-mono);font-size:10.5px;color:var(--side-mute);letter-spacing:.06em}
+.fade{transition:opacity .3s,transform .4s var(--ease)}
+.app[data-collapsed="true"] .fade{opacity:0;transform:translateX(-8px);pointer-events:none}
+.collapse{position:absolute;right:-17px;top:26px;width:34px;height:34px;border-radius:50%;background:var(--side);border:2px solid var(--bg);color:var(--side-fg);display:grid;place-items:center;
+  box-shadow:0 6px 16px -6px rgb(0 0 0 / .5);transition:transform .5s var(--spring),background-color .4s}
+.collapse:hover{transform:scale(1.08)}
+.app[data-collapsed="true"] .collapse svg{transform:rotate(180deg)}
+.collapse svg{transition:transform .5s var(--spring)}
+
+.snav{position:relative;display:grid;gap:6px}
+.sind{position:absolute;left:0;right:0;top:0;height:54px;background:var(--bg);border-radius:27px 0 0 27px;
+  transform:translateY(calc(var(--n,0) * 60px));transition:transform .6s var(--spring),background-color .4s;z-index:0;pointer-events:none}
+.sind::before,.sind::after{content:"";position:absolute;right:0;width:27px;height:27px;background:transparent;pointer-events:none}
+.sind::before{top:-27px;border-bottom-right-radius:27px;box-shadow:9px 9px 0 9px var(--bg)}
+.sind::after{bottom:-27px;border-top-right-radius:27px;box-shadow:9px -9px 0 9px var(--bg)}
+.sind::before,.sind::after{transition:box-shadow .4s}
+.snav button{position:relative;z-index:1;height:54px;display:flex;align-items:center;gap:16px;padding:0 18px 0 16px;border-radius:27px 0 0 27px;white-space:nowrap;overflow:hidden;
+  color:var(--side-fg);font-weight:600;font-size:15px;transition:color .35s}
+.snav button .ic{width:24px;height:24px;flex:0 0 auto;transition:transform .5s var(--spring)}
+.snav button:not([aria-current="true"]):hover{background:var(--side-hover);margin-right:16px;border-radius:16px}
+.snav button:not([aria-current="true"]):hover .ic{transform:scale(1.12) rotate(-6deg)}
+.snav button[aria-current="true"]{color:var(--fg)}
+.snav button[aria-current="true"] .ic{color:var(--accent);transform:scale(1.08)}
+.sfoot{margin-top:auto;padding-right:16px;display:grid;gap:14px}
+.daysleft{background:var(--side-hover);border-radius:16px;padding:12px 14px;white-space:nowrap;overflow:hidden}
+.daysleft b{font-family:var(--f-display);font-size:26px;color:#fff;line-height:1}
+.daysleft span{display:block;font-size:12px;color:var(--side-mute)}
+.app[data-collapsed="true"] .daysleft{padding:12px 0;text-align:center}
+.app[data-collapsed="true"] .daysleft span{display:none}
+
+/* skin segmented */
+.skins{position:relative;display:grid;grid-template-columns:repeat(3,1fr);background:rgb(255 255 255 / .06);border-radius:13px;padding:4px}
+.skins .pill{position:absolute;top:4px;bottom:4px;left:4px;width:calc((100% - 8px)/3);border-radius:10px;background:rgb(255 255 255 / .12);
+  transform:translateX(calc(var(--n,0) * 100%));transition:transform .55s var(--spring)}
+.skins button{position:relative;z-index:1;display:flex;align-items:center;justify-content:center;gap:5px;padding:7px 2px;font-size:12px;color:var(--side-mute);font-weight:600;white-space:nowrap}
+.skins button svg{width:14px;height:14px}
+.skins button[aria-pressed="true"]{color:#fff}
+.app[data-collapsed="true"] .side .skins{grid-template-columns:1fr;gap:2px}
+.app[data-collapsed="true"] .side .skins .pill{width:calc(100% - 8px);height:calc((100% - 8px)/3);bottom:auto;transform:translateY(calc(var(--n,0) * 100%))}
+.app[data-collapsed="true"] .side .skins button span{display:none}
+
+/* ---------- main ---------- */
+.main{min-width:0;padding-inline:clamp(16px,3.4vw,40px);padding-block:18px 60px}
+.inner{max-width:960px;margin:0 auto}
+.top{display:flex;align-items:center;gap:14px;margin-bottom:18px}
+.top .mmark{display:none}
+.top h1{margin:0;font-family:var(--f-display);font-weight:800;font-size:clamp(24px,3.4vw,32px);line-height:1.15;letter-spacing:-.01em}
+.top p{margin:0;font-size:13px;color:var(--muted)}
+.top .tt{flex:1;min-width:0}
+.sync{display:flex;align-items:center;gap:6px;font-size:11.5px;color:var(--muted);white-space:nowrap}
+.sync i{width:8px;height:8px;border-radius:50%;background:var(--muted)}
+.sync.ok i{background:var(--ok);box-shadow:0 0 0 3px color-mix(in srgb,var(--ok) 25%,transparent)}
+@keyframes ping{0%{box-shadow:0 0 0 0 color-mix(in srgb,var(--ok) 55%,transparent)}70%,100%{box-shadow:0 0 0 7px transparent}}
+
+/* neumorphic dark-mode switch */
+.neo{position:relative;width:76px;height:40px;border-radius:22px;background:var(--neo-bg);flex:0 0 auto;
+  box-shadow:inset 4px 4px 9px var(--neo-dark),inset -4px -4px 9px var(--neo-light);transition:background-color .4s,box-shadow .4s}
+.neo .hole{position:absolute;top:50%;right:13px;width:18px;height:8px;margin-top:-4px;border-radius:50%;background:var(--neo-hole);
+  box-shadow:inset 1px 2px 3px rgb(0 0 0 / .45);transition:right .6s var(--spring),left .6s var(--spring)}
+.neo .knob{position:absolute;top:5px;left:5px;width:30px;height:30px;border-radius:50%;background:var(--neo-bg);display:grid;place-items:center;
+  box-shadow:4px 4px 10px var(--neo-dark),-3px -3px 8px var(--neo-light);transition:transform .6s var(--spring),background-color .4s}
+.neo .knob svg{position:absolute;width:17px;height:17px;transition:opacity .35s,transform .6s var(--spring)}
+.neo .sun{color:#F59E0B;filter:drop-shadow(0 0 5px rgb(245 158 11 / .7))}
+.neo .moon{color:#38BDF8;filter:drop-shadow(0 0 6px rgb(56 189 248 / .9));opacity:0;transform:rotate(-90deg) scale(.4)}
+.neo[aria-checked="true"] .knob{transform:translateX(36px)}
+.neo[aria-checked="true"] .sun{opacity:0;transform:rotate(90deg) scale(.4)}
+.neo[aria-checked="true"] .moon{opacity:1;transform:none}
+.neo[aria-checked="true"] .hole{right:auto;left:13px}
+
+#view{animation:viewIn .45s var(--ease) both}
+#view.in-r{animation:inR .5s var(--ease) both}#view.in-l{animation:inL .5s var(--ease) both}
+#dayBody.in-r{animation:inR .5s var(--ease) both}#dayBody.in-l{animation:inL .5s var(--ease) both}
+.strip.in-r{animation:inR .45s var(--ease) both}.strip.in-l{animation:inL .45s var(--ease) both}
+@keyframes inR{from{opacity:0;transform:translate3d(42px,0,0)}to{opacity:1;transform:none}}
+@keyframes inL{from{opacity:0;transform:translate3d(-42px,0,0)}to{opacity:1;transform:none}}
+.swap{animation:swap .5s var(--ease) both}
+@keyframes swap{from{opacity:0;transform:translateY(10px);filter:blur(4px)}to{opacity:1;transform:none;filter:none}}
+button,.sd,.nb{touch-action:manipulation;-webkit-tap-highlight-color:transparent}
+.rip{position:absolute;border-radius:50%;background:currentColor;opacity:.22;transform:scale(0);animation:rip .6s var(--ease) forwards;pointer-events:none;z-index:0}
+@keyframes rip{to{transform:scale(1);opacity:0}}
+.wday,.bcard{content-visibility:auto;contain-intrinsic-size:auto 420px}
+.wday header{cursor:pointer}
+.bitem .when{cursor:pointer}
+.bnav .bi.bounce{animation:bounce .7s var(--spring)}
+@keyframes bounce{0%{transform:translateY(0) scale(.7)}55%{transform:translateY(-22px) scale(1.12)}100%{transform:translateY(-18px) scale(1)}}
+.dh-title{animation:swap .6s .05s var(--ease) both}
+.swipe-hint{display:none;text-align:center;font-size:11.5px;color:var(--muted);margin:-6px 0 10px}
+@media (hover:none){.swipe-hint{display:block}}
+@keyframes viewIn{from{opacity:.0;transform:translateY(10px)}to{opacity:1;transform:none}}
+.stag{animation:rise .5s var(--ease) both;animation-delay:min(calc(var(--i,0) * 35ms),380ms)}
+@keyframes rise{from{opacity:0;transform:translateY(14px) scale(.985)}to{opacity:1;transform:none}}
+
+/* ---------- home: strip ---------- */
+.strip{position:relative;display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:6px;margin-bottom:14px}
+.strip .ind{position:absolute;top:0;bottom:0;left:0;width:calc((100% - 36px)/7);border-radius:16px;
+  background:linear-gradient(160deg,var(--c),var(--c2));box-shadow:0 10px 22px -10px var(--c);
+  transform:translateX(calc(var(--n,0) * (100% + 6px)));transition:transform .6s var(--spring),background .4s}
+.sd{position:relative;z-index:1;overflow:hidden;border-radius:16px;padding:9px 2px 10px;display:grid;justify-items:center;gap:3px;min-width:0;
+  background:color-mix(in srgb,var(--surface) 70%,transparent);border:1px solid var(--line);transition:color .3s,border-color .3s,transform .4s var(--spring)}
+.sd:hover:not(:disabled){transform:translateY(-2px)}
+.sd small{font-size:11px;color:var(--muted);transition:color .3s}
+.sd b{font-family:var(--f-display);font-size:18px;font-weight:700;font-variant-numeric:tabular-nums;line-height:1.1}
+.sd .dot{width:6px;height:6px;border-radius:50%;background:var(--dc)}
+.sd .pr{width:62%;height:3px;border-radius:3px;background:color-mix(in srgb,var(--fg) 10%,transparent);overflow:hidden}
+.sd .pr i{display:block;height:100%;background:var(--ok);transition:width .5s var(--ease)}
+.sd[aria-current="true"]{color:#fff;border-color:transparent;background:transparent}
+.sd[aria-current="true"] small{color:rgb(255 255 255 / .85)}
+.sd[aria-current="true"] .dot{background:#fff}
+.sd[aria-current="true"] .pr{background:rgb(255 255 255 / .3)}
+.sd[aria-current="true"] .pr i{background:#fff}
+.sd.is-today:not([aria-current="true"]) small{color:var(--accent);font-weight:700}
+.sd:disabled{opacity:.3;cursor:default}
+
+/* ---------- home: day hero ---------- */
+.dhero{position:relative;overflow:hidden;border-radius:24px;padding:20px 22px 22px;margin-bottom:18px;border:1px solid color-mix(in srgb,var(--c) 25%,var(--line));
+  background:
+    radial-gradient(120% 140% at 0% 0%,color-mix(in srgb,var(--c) 22%,transparent),transparent 55%),
+    radial-gradient(90% 120% at 100% 100%,color-mix(in srgb,var(--c2) 20%,transparent),transparent 60%),
+    var(--surface);box-shadow:var(--shadow)}
+.dhero::after{content:"";position:absolute;inset:auto -40px -60px auto;width:220px;height:220px;border-radius:50%;
+  background:radial-gradient(circle,color-mix(in srgb,var(--c2) 35%,transparent),transparent 65%);animation:float 7s ease-in-out infinite;pointer-events:none}
+@keyframes float{50%{transform:translate(-18px,-12px) scale(1.08)}}
+.dh-top{display:flex;align-items:center;gap:10px;justify-content:space-between;flex-wrap:wrap;position:relative;z-index:1}
+.eyebrow{font-family:var(--f-mono);font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+.dh-nav{display:flex;gap:6px}
+.nb{position:relative;overflow:hidden;height:36px;min-width:36px;padding:0 10px;border-radius:12px;display:grid;place-items:center;font-size:13px;font-weight:600;
+  background:color-mix(in srgb,var(--surface) 75%,transparent);border:1px solid var(--line);transition:transform .4s var(--spring),border-color .3s}
+.nb:hover:not(:disabled){transform:translateY(-2px);border-color:var(--c)}
+.nb:disabled{opacity:.35;cursor:default}
+.dh-main{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:18px;align-items:center;margin-top:10px;position:relative;z-index:1}
+.dh-title{margin:0;font-family:var(--f-display);font-weight:800;font-size:clamp(30px,6vw,46px);line-height:1.05;letter-spacing:-.02em;
+  background:linear-gradient(100deg,var(--c),var(--c2));-webkit-background-clip:text;background-clip:text;color:transparent;text-wrap:balance}
+.dh-sub{margin:8px 0 0;font-size:14px;color:var(--muted)}
+.dh-sub b{color:var(--fg);font-family:var(--f-mono)}
+.dh-next{display:flex;gap:10px;align-items:center;margin-top:14px;padding:10px 12px;border-radius:14px;background:color-mix(in srgb,var(--surface) 70%,transparent);border:1px solid var(--line);font-size:13.5px;min-width:0}
+.dh-next .lbl{font-family:var(--f-mono);font-size:10.5px;font-weight:700;letter-spacing:.08em;color:var(--c);white-space:nowrap}
+.dh-next span:last-child{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+
+/* rings */
+.ring{position:relative;display:grid;place-items:center}
+.ring svg{transform:rotate(-90deg)}
+.ring .rb{fill:none;stroke:color-mix(in srgb,var(--fg) 10%,transparent)}
+.ring .rf{fill:none;stroke-linecap:round;transition:stroke-dashoffset 1s var(--ease)}
+.ring .rv{position:absolute;font-family:var(--f-mono);font-weight:700}
+.ring.big{width:104px;height:104px}.ring.big svg{width:104px;height:104px}.ring.big .rv{font-size:20px}
+.ring.sm{width:38px;height:38px}.ring.sm svg{width:38px;height:38px}.ring.sm .rv{font-size:10px}
+
+/* ---------- task cards ---------- */
+.tl{display:grid;gap:10px}
+.tk{position:relative;display:grid;grid-template-columns:48px minmax(0,1fr) 44px;gap:14px;align-items:start;padding:14px 14px 16px;border-radius:18px;
+  background:var(--surface);border:1px solid color-mix(in srgb,var(--c) 18%,var(--line));overflow:hidden;
+  transition:transform .45s var(--spring),box-shadow .4s,border-color .3s,opacity .4s}
+.tk::before{content:"";position:absolute;left:0;top:14px;bottom:14px;width:3px;border-radius:0 3px 3px 0;background:linear-gradient(var(--c),var(--c2))}
+.tk .glow{position:absolute;left:14px;right:14px;bottom:0;height:2px;border-radius:2px;background:color-mix(in srgb,var(--fg) 6%,transparent);overflow:hidden}
+.tk .glow i{display:block;height:100%;width:28%;background:linear-gradient(90deg,var(--c),var(--c2));box-shadow:0 0 12px var(--c);transition:width .8s var(--ease)}
+.tk:hover{transform:translateY(-3px);box-shadow:0 18px 34px -20px color-mix(in srgb,var(--c) 70%,transparent);border-color:color-mix(in srgb,var(--c) 40%,var(--line))}
+.ico{width:48px;height:48px;border-radius:14px;display:grid;place-items:center;color:#fff;background:linear-gradient(140deg,var(--c),var(--c2));
+  box-shadow:0 8px 20px -8px var(--c),inset 0 1px 0 rgb(255 255 255 / .35);transition:transform .5s var(--spring)}
+.ico svg{width:22px;height:22px}
+.tk:hover .ico{transform:rotate(-8deg) scale(1.06)}
+.r1{display:flex;gap:6px 8px;align-items:center;flex-wrap:wrap;margin-bottom:3px}
+.tm{font-family:var(--f-mono);font-size:12px;font-weight:700;color:var(--fg);font-variant-numeric:tabular-nums}
+.tm small{font-family:var(--f-body);font-weight:500;color:var(--muted);font-size:11px;margin-left:3px}
+.pill{font-family:var(--f-mono);font-size:10.5px;font-weight:700;letter-spacing:.04em;color:var(--c);background:color-mix(in srgb,var(--c) 14%,transparent);padding:1px 8px;border-radius:7px}
+.kind{font-size:11.5px;color:var(--muted);font-weight:600}
+.kind.old{color:var(--warn)}
+.live-b{font-size:10.5px;font-weight:700;color:#fff;background:linear-gradient(90deg,var(--c),var(--c2));padding:1px 8px;border-radius:7px;animation:pulse 1.6s ease-in-out infinite}
+@keyframes pulse{50%{opacity:.65}}
+.tk h4{margin:0;font-size:15.5px;font-weight:600;line-height:1.45}
+.tk h4 span{background:linear-gradient(currentColor,currentColor) no-repeat 0 58%/0% 1.6px;transition:background-size .5s var(--ease),color .3s}
+.tk p{margin:4px 0 0;font-size:13px;color:var(--muted);line-height:1.55}
+.tk.done{opacity:.72}
+.tk.done h4 span{background-size:100% 1.6px;color:var(--muted)}
+.tk.done .glow i{width:100%;background:linear-gradient(90deg,var(--ok),var(--ok2));box-shadow:0 0 12px var(--ok)}
+.tk.live{border-color:var(--c);box-shadow:0 0 0 1px var(--c),0 18px 40px -22px var(--c)}
+.tk.live .ico{animation:liveRing 2s infinite}
+@keyframes liveRing{0%{box-shadow:0 0 0 0 color-mix(in srgb,var(--c) 60%,transparent)}80%,100%{box-shadow:0 0 0 12px transparent}}
+.tk.fixed{background:color-mix(in srgb,var(--c) 7%,var(--surface));border-style:dashed}
+.tk.fixed .chk{visibility:hidden}
+.tk.fixed .glow{display:none}
+.rest{display:flex;align-items:center;gap:10px;color:var(--muted);font-size:12.5px;padding:2px 6px}
+.rest::before,.rest::after{content:"";flex:1;height:1px;background:repeating-linear-gradient(90deg,var(--line) 0 6px,transparent 6px 11px)}
+.rest svg{width:15px;height:15px}
+.rest .mono{font-size:11.5px}
+
+/* check button + burst */
+.chk{position:relative;width:42px;height:42px;border-radius:50%;display:grid;place-items:center;transition:transform .45s var(--spring)}
+.chk:hover{transform:scale(1.08)}
+.chk:active{transform:scale(.9)}
+.chk .cs{width:42px;height:42px}
+.chk .cb{fill:none;stroke:var(--line);stroke-width:2.5;transition:stroke .3s}
+.chk .cf{fill:var(--ok);transform-origin:21px 21px;transform:scale(0);transition:transform .45s var(--spring)}
+.chk .cm{fill:none;stroke:#fff;stroke-width:3.2;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:22;stroke-dashoffset:22;transition:stroke-dashoffset .35s .12s var(--ease)}
+.done .chk .cf,.chk[aria-pressed="true"] .cf{transform:scale(1)}
+.done .chk .cb{stroke:var(--ok)}
+.done .chk .cm{stroke-dashoffset:0}
+.burst{position:absolute;inset:0;pointer-events:none}
+.burst i{position:absolute;left:50%;top:50%;width:6px;height:6px;margin:-3px;border-radius:50%;background:var(--bc,var(--ok));opacity:0}
+.pop .burst i{animation:burst .7s var(--ease) forwards}
+@keyframes burst{0%{opacity:1;transform:rotate(var(--a)) translateY(0) scale(1)}100%{opacity:0;transform:rotate(var(--a)) translateY(-30px) scale(.2)}}
+.pop{animation:popCard .5s var(--spring)}
+@keyframes popCard{40%{transform:scale(1.015)}}
+
+/* ---------- generic cards ---------- */
+.card{background:var(--surface);border:1px solid var(--line);border-radius:20px;padding:18px 20px;min-width:0}
+.card h3{margin:0 0 10px;font-family:var(--f-display);font-size:18px;text-wrap:balance}
+h2.sec{font-family:var(--f-display);font-size:20px;margin:26px 0 12px}
+.note{font-size:13px;color:var(--muted)}
+
+/* progress tab */
+.phero{position:relative;overflow:hidden;border-radius:24px;padding:22px;background:var(--side);color:#F3F4FF;display:grid;gap:16px;box-shadow:var(--shadow)}
+.phero::before{content:"";position:absolute;inset:0;pointer-events:none;opacity:.55;
+  background:radial-gradient(40% 60% at 92% 8%,color-mix(in srgb,var(--hex) 55%,transparent),transparent 70%),radial-gradient(35% 55% at 70% 0%,color-mix(in srgb,var(--dip) 40%,transparent),transparent 70%),radial-gradient(40% 50% at 100% 70%,color-mix(in srgb,var(--ict) 45%,transparent),transparent 70%);
+  animation:drift 9s ease-in-out infinite alternate}
+@keyframes drift{to{transform:translate3d(-24px,10px,0) scale(1.06)}}
+@keyframes spin{to{transform:rotate(360deg)}}
+.phero h2{margin:0;font-family:var(--f-display);font-weight:800;font-size:clamp(24px,4.4vw,36px);line-height:1.15;text-wrap:balance;position:relative}
+.phero h2 em{font-style:normal;background:linear-gradient(90deg,var(--sft),var(--dip));-webkit-background-clip:text;background-clip:text;color:transparent}
+.stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;position:relative}
+.stat{background:rgb(255 255 255 / .06);border:1px solid rgb(255 255 255 / .1);border-radius:16px;padding:12px 14px;min-width:0}
+.stat b{display:block;font-family:var(--f-display);font-weight:700;font-size:28px;line-height:1.1;font-variant-numeric:tabular-nums}
+.stat span{font-size:12.5px;color:#AEB4DA}
+.sbar{height:5px;border-radius:9px;background:rgb(255 255 255 / .12);overflow:hidden;margin-top:9px}
+.sbar i{display:block;height:100%;border-radius:9px;background:linear-gradient(90deg,#fff,#C7CBFF);transition:width 1s var(--ease)}
+.dls{display:flex;gap:10px;overflow-x:auto;padding:14px 2px 6px;scrollbar-width:none}
+.dls::-webkit-scrollbar{display:none}
+.dl{position:relative;overflow:hidden;flex:0 0 auto;display:flex;align-items:center;gap:12px;background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:10px 14px;transition:transform .4s var(--spring)}
+.dl:hover{transform:translateY(-2px)}
+.dl .n{width:44px;height:44px;border-radius:13px;display:grid;place-items:center;font-family:var(--f-display);font-weight:800;font-size:18px;color:#fff;
+  background:linear-gradient(140deg,var(--c),var(--c2));box-shadow:0 8px 18px -8px var(--c);font-variant-numeric:tabular-nums}
+.dl .t{font-size:13px;line-height:1.35;font-weight:600}
+.dl .t small{display:block;color:var(--muted);font-size:11.5px;font-weight:400}
+.dl.past{opacity:.5}
+.missed{border:1px solid color-mix(in srgb,var(--warn) 35%,var(--line));background:color-mix(in srgb,var(--warn) 5%,var(--surface));border-radius:20px;margin-top:16px}
+.missed summary{list-style:none;cursor:pointer;padding:14px 16px;display:flex;align-items:center;gap:12px;font-weight:600}
+.missed summary::-webkit-details-marker{display:none}
+.missed summary .n{min-width:40px;height:40px;border-radius:12px;display:grid;place-items:center;font-family:var(--f-display);font-weight:800;color:#fff;background:linear-gradient(140deg,var(--warn),#F97316)}
+.missed summary small{display:block;font-weight:400;color:var(--muted);font-size:12.5px}
+.missed .chev{margin-left:auto;transition:transform .4s var(--spring)}
+.missed[open] .chev{transform:rotate(180deg)}
+.missed .tl{padding:0 12px 14px}
+.bgrid{display:grid;align-items:start;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:12px}
+.bcard{position:relative;overflow:hidden}
+.bcard::after{content:"";position:absolute;right:-50px;top:-50px;width:140px;height:140px;border-radius:50%;background:radial-gradient(circle,color-mix(in srgb,var(--c) 22%,transparent),transparent 70%);pointer-events:none}
+.bhead{display:flex;align-items:center;gap:12px;margin-bottom:12px}
+.bhead .ico{width:42px;height:42px;border-radius:13px}
+.bhead h3{margin:0;font-size:17px}
+.bhead small{display:block;font-size:12px;color:var(--muted);font-weight:500;font-family:var(--f-body)}
+.bhead .ring{margin-left:auto}
+.gbar{height:8px;border-radius:8px;background:var(--surface-2);overflow:hidden}
+.gbar i{display:block;height:100%;border-radius:8px;background:linear-gradient(90deg,var(--c),var(--c2));transition:width 1s var(--ease)}
+.meter{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:4px 10px;font-size:13px;margin:4px 0 12px}
+.meter .gbar{grid-column:1/-1;height:6px;margin-bottom:6px}
+.bitem{display:grid;grid-template-columns:32px minmax(0,1fr) auto;gap:8px;align-items:center;padding:6px 0;border-top:1px solid var(--surface-2);font-size:13.5px;line-height:1.45}
+.bitem .chk,.mini .chk{width:30px;height:30px}
+.bitem .chk .cs,.mini .chk .cs{width:30px;height:30px}
+.bitem .bt span{background:linear-gradient(currentColor,currentColor) no-repeat 0 58%/0% 1.4px;transition:background-size .5s var(--ease)}
+.bitem.done .bt span{background-size:100% 1.4px;color:var(--muted)}
+.bitem .when{font-family:var(--f-mono);font-size:11px;color:var(--muted);white-space:nowrap}
+.bitem .when.late{color:var(--warn);font-weight:700}
+
+/* week */
+.wkhead{display:flex;align-items:center;gap:10px;margin-bottom:14px}
+.wkhead .tt{flex:1;min-width:0}
+.wkhead h2{margin:0;font-family:var(--f-display);font-size:22px}
+.wkhead p{margin:0;font-size:13px;color:var(--muted)}
+.weekgrid{display:grid;align-items:start;grid-template-columns:repeat(auto-fill,minmax(290px,1fr));gap:12px}
+.wday{background:var(--surface);border:1px solid var(--line);border-radius:20px;overflow:hidden;min-width:0;transition:transform .45s var(--spring),box-shadow .4s}
+.wday:hover{transform:translateY(-3px);box-shadow:var(--shadow)}
+.wday header{display:flex;align-items:center;gap:10px;padding:12px 14px;background:linear-gradient(120deg,color-mix(in srgb,var(--c) 16%,var(--surface)),color-mix(in srgb,var(--c2) 8%,var(--surface)))}
+.wday header b{font-family:var(--f-display);font-size:16px;display:block;line-height:1.25}
+.wday header small{color:var(--muted);font-size:12px;display:block;line-height:1.3}
+.wday header .ring{margin-left:auto}
+.wday.is-today{box-shadow:0 0 0 2px var(--accent)}
+.wday .open{font-size:12px;font-weight:600;color:var(--c);padding:8px 14px 12px;display:block}
+.mini{display:grid;grid-template-columns:42px minmax(0,1fr) 30px;gap:8px;align-items:center;padding:7px 12px;border-top:1px solid var(--surface-2)}
+.mini .tmn{font-family:var(--f-mono);font-size:11px;color:var(--muted)}
+.mini .tx{font-size:13px;line-height:1.4;min-width:0}
+.mini .tx i{font-style:normal;display:inline-block;width:7px;height:7px;border-radius:50%;background:linear-gradient(var(--c),var(--c2));margin-right:7px;vertical-align:1px}
+.mini .tx span{background:linear-gradient(currentColor,currentColor) no-repeat 0 58%/0% 1.4px;transition:background-size .5s var(--ease)}
+.mini.done .tx span{background-size:100% 1.4px;color:var(--muted)}
+.mini.fixed .tx{color:var(--muted)}
+.mini.fixed .chk{visibility:hidden}
+
+/* rules */
+.cols{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:12px}
+.card ol,.card ul{margin:0;padding-left:20px;display:grid;gap:9px;font-size:14px}
+.card li b{font-weight:600}
+.card li span{color:var(--muted);display:block;font-size:13px}
+.dep{display:grid;gap:8px}
+.dep div{display:grid;grid-template-columns:minmax(0,1fr) auto minmax(0,1fr);gap:8px;align-items:center;font-size:13px;background:var(--surface-2);border-radius:12px;padding:9px 11px}
+.dep div i{font-style:normal;color:var(--accent);font-family:var(--f-mono);font-weight:700}
+.dep div small{grid-column:1/-1;color:var(--muted);font-size:12.5px}
+.hours{display:grid;gap:8px}
+.hrow{display:grid;grid-template-columns:84px minmax(0,1fr) 46px;gap:10px;align-items:center;font-size:13px}
+.hrow .gbar{height:10px}
+.hrow .hv{font-family:var(--f-mono);font-size:12px;text-align:right;color:var(--muted)}
+.frame{overflow-x:auto}
+.frame table{border-collapse:collapse;width:100%;min-width:560px;font-size:12.5px}
+.frame th,.frame td{text-align:left;padding:8px;border-bottom:1px solid var(--surface-2);vertical-align:top}
+.frame th{font-weight:600;white-space:nowrap}
+.frame td span{display:inline-block;margin:0 4px 4px 0;padding:2px 8px;border-radius:8px;background:color-mix(in srgb,var(--c) 13%,transparent)}
+.frame td span b{font-family:var(--f-mono);font-size:11px;color:var(--c);margin-right:4px}
+.skincard .skins{background:var(--surface-2);max-width:360px}
+.skincard .skins .pill{background:var(--surface);box-shadow:0 2px 8px -2px rgb(0 0 0 / .2)}
+.skincard .skins button{color:var(--muted);font-size:13px;padding:9px 4px}
+.skincard .skins button[aria-pressed="true"]{color:var(--fg)}
+
+/* ---------- bottom nav (phone) ---------- */
+.bnav{display:none}
+@media (max-width:860px){
+  .app,.app[data-collapsed="true"]{grid-template-columns:minmax(0,1fr)}
+  .side{display:none}
+  .main{padding-block:14px 120px}
+  .top .mmark{display:grid;width:38px;height:38px;border-radius:12px;font-size:17px}
+  .bnav{display:grid;grid-template-columns:repeat(4,1fr);position:fixed;z-index:40;left:12px;right:12px;bottom:calc(12px + env(safe-area-inset-bottom,0px));height:66px;
+    background:var(--side);border-radius:24px;box-shadow:0 18px 40px -14px rgb(0 0 0 / .55);transition:background-color .4s}
+  .bump{position:absolute;top:-17px;left:0;width:25%;height:20px;transform:translateX(calc(var(--n,0) * 100%));transition:transform .6s var(--spring);pointer-events:none}
+  .bump svg{width:100%;height:100%;overflow:visible}
+  .bump .bf{fill:var(--side);transition:fill .4s}
+  .bump .bl{fill:none;stroke:url(#bumpGrad);stroke-width:2.2;filter:drop-shadow(0 -2px 6px color-mix(in srgb,var(--accent) 70%,transparent))}
+  .bnav button{position:relative;display:grid;justify-items:center;align-content:center;gap:2px;color:var(--side-mute);font-size:11px;font-weight:600}
+  .bnav .bi{width:44px;height:44px;border-radius:50%;display:grid;place-items:center;transition:transform .6s var(--spring),background .4s,box-shadow .4s}
+  .bnav .bi svg{width:22px;height:22px}
+  .bnav button span{transition:opacity .3s,transform .5s var(--spring)}
+  .bnav button[aria-current="true"]{color:#fff}
+  .bnav button[aria-current="true"] .bi{transform:translateY(-18px);background:linear-gradient(140deg,var(--accent),var(--accent2));box-shadow:0 10px 22px -6px color-mix(in srgb,var(--accent) 80%,transparent)}
+  .bnav button[aria-current="true"] span{transform:translateY(-14px)}
+  .bnav button:not([aria-current="true"]) .bi{margin-bottom:-2px}
+}
+@media (max-width:640px){.stats{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media (max-width:520px){
+  .tk{grid-template-columns:40px minmax(0,1fr) 40px;gap:11px;padding:12px 10px 14px 12px}
+  .ico{width:40px;height:40px;border-radius:12px}.ico svg{width:19px;height:19px}
+  .chk,.chk .cs{width:38px;height:38px}
+  .dh-main{grid-template-columns:minmax(0,1fr)}
+  .dh-main .ring{position:absolute;right:0;top:-6px}
+  .ring.big,.ring.big svg{width:78px;height:78px}.ring.big .rv{font-size:15px}
+  .dh-title{padding-right:84px}
+  .weekgrid,.bgrid{grid-template-columns:minmax(0,1fr)}
+  .sd b{font-size:16px}
+}
+@media (prefers-reduced-motion:reduce){.splash{display:none}*,*::before,*::after{animation:none!important;transition:none!important}}
+</style>
+<style>
+html,body{margin:0}
+[hidden]{display:none!important}
+img{max-width:100%}
+.main{padding-top:calc(18px + env(safe-area-inset-top,0px))}
+.side{padding-top:calc(22px + env(safe-area-inset-top,0px))}
+.inst{height:38px;padding:0 14px;border-radius:12px;display:flex;align-items:center;gap:7px;font-size:13px;font-weight:600;color:#fff;
+  background:linear-gradient(135deg,var(--accent),var(--accent2));box-shadow:0 8px 18px -8px var(--accent);animation:rise .5s var(--ease) both;white-space:nowrap}
+.inst svg{width:16px;height:16px}
+.ioshint{position:fixed;left:12px;right:12px;bottom:calc(92px + env(safe-area-inset-bottom,0px));z-index:60;background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:14px 16px;box-shadow:var(--shadow);font-size:13.5px;display:flex;gap:12px;align-items:flex-start;animation:rise .5s var(--ease) both}
+.ioshint b{display:block;margin-bottom:2px}
+.ioshint button{margin-left:auto;font-size:18px;color:var(--muted);padding:0 4px}
+</style>
+</head>
+<body>
+
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
+  <linearGradient id="bumpGrad" x1="0" x2="1"><stop offset="0" stop-color="var(--accent)" stop-opacity="0"/><stop offset=".5" stop-color="var(--accent2)"/><stop offset="1" stop-color="var(--accent)" stop-opacity="0"/></linearGradient>
+</defs></svg>
+
+<div class="splash" id="splash" role="img" aria-label="Nima Schedule">
+  <div class="sp-in">
+    <div class="sp-ring"><svg class="sp-logo" viewBox="0 0 96 96" aria-hidden="true"><defs><linearGradient id="spg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="var(--accent)"/><stop offset="1" stop-color="var(--accent2)"/></linearGradient></defs>
+<rect class="lg-bg" x="4" y="4" width="88" height="88" rx="26" fill="url(#spg)"/>
+<rect class="lg-hi" x="4" y="4" width="88" height="44" rx="26" fill="#fff" opacity=".12"/>
+<path class="lg-cal" d="M26 34a6 6 0 0 1 6-6h32a6 6 0 0 1 6 6v30a6 6 0 0 1-6 6H32a6 6 0 0 1-6-6zM26 41h44M38 22v11M58 22v11" fill="none" stroke="#fff" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+<path class="lg-chk" d="M37 55l7 7 15-15" fill="none" stroke="#fff" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
+<circle class="lg-dot" cx="80" cy="16" r="6" fill="#FBBF24"/></svg></div>
+    <h1 class="sp-name"><span style="--i:0">N</span><span style="--i:1">i</span><span style="--i:2">m</span><span style="--i:3">a</span><span class="sp" style="--i:4"> </span><span class="g" style="--i:5">S</span><span class="g" style="--i:6">c</span><span class="g" style="--i:7">h</span><span class="g" style="--i:8">e</span><span class="g" style="--i:9">d</span><span class="g" style="--i:10">u</span><span class="g" style="--i:11">l</span><span class="g" style="--i:12">e</span></h1>
+    <p class="sp-tag">ඔක් 12 → නොවැ 30 · Balance plan</p>
+    <div class="sp-bar"><i></i></div>
+  </div>
+  <span class="sp-skip">Tap කරලා skip කරන්න</span>
+</div>
+
+<div class="app" id="app" data-collapsed="false">
+  <aside class="side" id="side" aria-label="Menu">
+    <button class="collapse" id="collapse" aria-label="Menu එක හකුළන්න"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M15 6l-6 6 6 6"/></svg></button>
+    <div class="brand"><span class="mark logo"><svg class="lg" viewBox="0 0 96 96" aria-hidden="true"><defs><linearGradient id="sbg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="var(--accent)"/><stop offset="1" stop-color="var(--accent2)"/></linearGradient></defs>
+<rect class="lg-bg" x="4" y="4" width="88" height="88" rx="26" fill="url(#sbg)"/>
+<rect class="lg-hi" x="4" y="4" width="88" height="44" rx="26" fill="#fff" opacity=".12"/>
+<path class="lg-cal" d="M26 34a6 6 0 0 1 6-6h32a6 6 0 0 1 6 6v30a6 6 0 0 1-6 6H32a6 6 0 0 1-6-6zM26 41h44M38 22v11M58 22v11" fill="none" stroke="#fff" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+<path class="lg-chk" d="M37 55l7 7 15-15" fill="none" stroke="#fff" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
+<circle class="lg-dot" cx="80" cy="16" r="6" fill="#FBBF24"/></svg></span><span class="fade"><b>Nima Schedule</b><small>ඔක් 12 → නොවැ 30</small></span></div>
+    <nav class="snav" id="snav"><span class="sind" id="sind"></span></nav>
+    <div class="sfoot">
+      <div class="daysleft"><b id="dleft">–</b><span class="fade">නොවැ 30ට දින</span></div>
+      <div class="skins" data-skins><span class="pill"></span></div>
+      <div class="sync fade" id="sync"><i></i><span>මේ device එකේ සුරැකෙනවා</span></div>
+    </div>
+  </aside>
+
+  <div class="main"><div class="inner">
+    <header class="top">
+      <span class="mark mmark logo"><svg class="lg" viewBox="0 0 96 96" aria-hidden="true"><defs><linearGradient id="tpg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="var(--accent)"/><stop offset="1" stop-color="var(--accent2)"/></linearGradient></defs>
+<rect class="lg-bg" x="4" y="4" width="88" height="88" rx="26" fill="url(#tpg)"/>
+<rect class="lg-hi" x="4" y="4" width="88" height="44" rx="26" fill="#fff" opacity=".12"/>
+<path class="lg-cal" d="M26 34a6 6 0 0 1 6-6h32a6 6 0 0 1 6 6v30a6 6 0 0 1-6 6H32a6 6 0 0 1-6-6zM26 41h44M38 22v11M58 22v11" fill="none" stroke="#fff" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+<path class="lg-chk" d="M37 55l7 7 15-15" fill="none" stroke="#fff" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
+<circle class="lg-dot" cx="80" cy="16" r="6" fill="#FBBF24"/></svg></span>
+      <div class="tt"><h1 id="ttl">අද</h1><p id="tsub"></p></div>
+      <button class="inst" id="install" hidden aria-label="Phone එකට install කරන්න"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12M7 10l5 5 5-5M5 21h14"/></svg>Install</button>
+      <button class="neo" id="neo" role="switch" aria-checked="false" aria-label="Dark mode">
+        <span class="hole"></span>
+        <span class="knob">
+          <svg class="sun" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="4.2"/><path d="M12 2.5v2M12 19.5v2M2.5 12h2M19.5 12h2M5.2 5.2l1.4 1.4M17.4 17.4l1.4 1.4M5.2 18.8l1.4-1.4M17.4 6.6l1.4-1.4" fill="none"/></svg>
+          <svg class="moon" viewBox="0 0 24 24" fill="currentColor"><path d="M20.5 14.6A8.5 8.5 0 0 1 9.4 3.5a8.5 8.5 0 1 0 11.1 11.1z"/></svg>
+        </span>
+      </button>
+    </header>
+    <main id="view"></main>
+  </div></div>
+
+  <nav class="bnav" id="bnav" aria-label="Tabs">
+    <span class="bump"><svg viewBox="0 0 100 20" preserveAspectRatio="none"><path class="bf" d="M0 20 C 22 20, 24 2, 50 2 C 76 2, 78 20, 100 20 Z"/><path class="bl" d="M0 20 C 22 20, 24 2, 50 2 C 76 2, 78 20, 100 20" vector-effect="non-scaling-stroke"/></svg></span>
+  </nav>
+</div>
+
+<script>
+(function(){
+const START='2026-10-12', END='2026-11-30';
+const SUBJ={
+  sft:{n:'SFT',c:'var(--sft)',full:'Science for Technology'},
+  et:{n:'ET',c:'var(--et)',full:'Engineering Technology'},
+  ict:{n:'ICT',c:'var(--ict)',full:'Information & Communication Technology'},
+  dip:{n:'DIPLOMA',c:'var(--dip)',full:'Technology diploma'},
+  hex:{n:'HEXORA',c:'var(--hex)',full:'Hexora site සහ apps'},
+  asg:{n:'කඩේ PC',c:'var(--asg)',full:'Diploma assignments (Mini Magazine ඇතුළුව)'},
+  rev:{n:'REVIEW',c:'var(--rev)',full:'Review'},
+  mix:{n:'පන්ති',c:'var(--mix)',full:''}
+};
+const KIND={old:'පරණ වැඩ',now:'දැන් යන',cls:'පන්තිය',daily:'හැමදාම',rev:'Review',rest:''};
+const DAYS=['ඉරිදා','සඳුදා','අඟහරුවාදා','බදාදා','බ්‍රහස්පතින්දා','සිකුරාදා','සෙනසුරාදා'];
+const DSH=['ඉරි','සඳු','අඟ','බදා','බ්‍රහ','සිකු','සෙන'];
+const MON={10:'ඔක්',11:'නොවැ'}; const MONF={10:'ඔක්තෝබර්',11:'නොවැම්බර්'};
+const DAYTYPE={1:['SFT දවස','sft'],2:['ICT දවස','ict'],3:['ET දවස','et'],4:['ICT දවස','ict'],5:['SFT දවස','sft'],6:['පන්ති දවස · ET + SFT','mix'],0:['Diploma · Assignments · Hexora','dip']};
+
+const isoAdd=(iso,n)=>{const d=new Date(iso+'T00:00:00Z');d.setUTCDate(d.getUTCDate()+n);return d.toISOString().slice(0,10)};
+const dow=iso=>new Date(iso+'T00:00:00Z').getUTCDay();
+const diff=(a,b)=>Math.round((new Date(b+'T00:00:00Z')-new Date(a+'T00:00:00Z'))/864e5);
+const fmt=iso=>{const m=+iso.slice(5,7),d=+iso.slice(8,10);return MON[m]+' '+d};
+const fmtLong=iso=>{const m=+iso.slice(5,7),d=+iso.slice(8,10);return MONF[m]+' '+d};
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+function mins(t,ap){let[h,m]=t.split(':').map(Number);if(ap==='pm'&&h<12)h+=12;return h*60+m}
+function todayISO(){try{return new Intl.DateTimeFormat('en-CA',{timeZone:'Asia/Colombo',year:'numeric',month:'2-digit',day:'2-digit'}).format(new Date())}catch(e){return new Date().toISOString().slice(0,10)}}
+
+/* ---------- queues ---------- */
+const SFT_Q=[
+ [{ti:'Unit 04 notes පොතේ ලියන්න — 1 කොටස',d:'පන්තියේ ඉගැන්නුව කොටස ඔක්කොම පොතට. මුලින් content එක, diagrams සහ පාට පස්සේ.',bl:1},
+  {ti:'Unit 04 notes ඉවර කරන්න',d:'Notes ඉවර නැතුව flash cards හදන්න බෑ. ඒ නිසා අද ඉවර කරන්නම ඕන.',bl:1}],
+ [{ti:'Unit 02 + 04 full paper — වැරදුණු ප්‍රශ්න ආයේ කරන්න',d:'වැරදුණු ප්‍රශ්න විතරක්. Discuss කරපු උත්තර එක්ක check කරලා, වැරදුණේ ඇයි කියලා කෙටියෙන් ලියන්න.',bl:1},
+  {ti:'Unit 04 tute සම්පූර්ණ කරන්න',d:'ඉතුරු ප්‍රශ්න ඔක්කොම. බැරි ඒවා ලකුණු කරලා සෙනසුරාදා පන්තියේ අහන්න.',bl:1}],
+ [{ti:'Unit 04 flash cards හදන්න',d:'Deadline හෙට (ඔක් 24). Card 30–40ක්: ඉස්සරහ ප්‍රශ්නය/පදය, පිටිපස්සේ උත්තරය/සූත්‍රය. එක පාට theme එකක් තියාගෙන ලස්සනට.',bl:1},
+  {ti:'Flash cards ඉවර කරලා Unit 04 පාඩම් කරන්න',d:'Cards වලින්ම තමන්ගෙන්ම ප්‍රශ්න අහලා පාඩම් කරන්න. ඒ ප්‍රශ්නම SFT quiz app එකටත් දාන්න පුළුවන්.',bl:1}],
+ [{ti:'Unit 02 tute ගණන් — 1 කොටස',d:'බාගයක් විතර. හැම ගණනකම සූත්‍රය උඩින්ම ලියන්න.',bl:1},
+  {ti:'Unit 01 / 03 tute (අලුත් වැඩ)',d:'මූලික ගණිතය සහ පයිතගරස් සම්බන්ධය tute එක, පන්තිය ගිය තැනට.',k:'now'}],
+ [{ti:'Unit 02 tute ගණන් ඉවර කරලා පාඩම් කරන්න',d:'ඉතුරු ගණන් + පාඩමේ definitions/සූත්‍ර පාඩම් කරන්න.',bl:1},
+  {ti:'Unit 02 short note',d:'පිටු 2–3ක් උපරිම: සූත්‍ර, definitions, ඒකක, කලින් වැරදුණු තැන්.',bl:1}],
+ [{ti:'Unit 04 short note',d:'Notes සහ flash cards වලින් වැදගත්ම ටික විතරක්.',bl:1},
+  {ti:'Unit 01 / 03 tute (අලුත් වැඩ)',d:'පන්තිය ගිය තැනට.',k:'now'}],
+ [{ti:'Unit 02 පාඩම් paper එක',d:'වෙලාව තියාගෙන කරන්න. වැරදුණු ඒවට විවරණය ලියන්න.',bl:1},
+  {ti:'Unit 04 පාඩම් paper එක',d:'වෙලාව තියාගෙන කරන්න. වැරදුණු ඒවට විවරණය ලියන්න.',bl:1}],
+ [{ti:'Unit 01 short note + paper',d:'පාඩම ඉවර නම්. නැත්නම් මේ කාලය tute එකට දෙන්න.',k:'now'},
+  {ti:'අලුත් පාඩම: notes + tute',d:'පන්තිය ගිය තැනට.',k:'now'}],
+ [{ti:'Unit 03 short note',k:'now'},{ti:'අලුත් පාඩම: notes + tute',k:'now'}],
+ [{ti:'Unit 03 paper + විවරණය',k:'now'},{ti:'අලුත් පාඩම: notes + tute',k:'now'}],
+ [{ti:'Units 02 + 04 වැරදුණු ප්‍රශ්න revision',d:'Papers වල වැරදුණු ප්‍රශ්න ආයේ කරලා බලන්න.',k:'now'},{ti:'අලුත් පාඩම: notes + tute',k:'now'}],
+ [{ti:'Units 01–04 mixed paper (වෙලාව එක්ක)',k:'now'},{ti:'අලුත් පාඩම: notes + tute',k:'now'}],
+ [{ti:'Mixed paper එකේ වැරදි විවරණය + දුර්වල කොටස්',k:'now'},{ti:'අලුත් පාඩම: notes + tute',k:'now'}],
+ [{ti:'Balance check — SFT',d:'"පරණ වැඩ" tab එකේ SFT ලැයිස්තුව බලලා ඉතුරු දේවල් තියෙනවා නම් ලියාගන්න.',k:'rev'},{ti:'අලුත් පාඩම: notes + tute',k:'now'}]
+];
+const ET_Q=[
+ [{ti:'ET full paper ආයේ කරන්න',d:'මේ දක්වා උගන්නපු පාඩම් වලින් දීපු paper එක. වෙලාව තියාගෙන.',bl:1},
+  {ti:'Full paper එකේ වැරදි විවරණය කරගන්න',d:'වැරදුණු හැම ප්‍රශ්නයකටම නිවැරදි ක්‍රමය + වැරදුණේ ඇයි. වැඩිපුර වැරදුණු පාඩම් ලකුණු කරගන්න.',bl:1}],
+ [{ti:'Unit 05 ගණන් පුරුදු වෙන්න',d:'Tute + paper ගණන්. සූත්‍ර ලැයිස්තුවක් පැත්තකින් තියාගන්න.',bl:1},
+  {ti:'Unit 06 notes + tute (දැන් යන කොටස)',d:'6.4 සිට පන්තිය ගිය තැනට notes සම්පූර්ණ කරලා tute එක.',k:'now'}],
+ [{ti:'Unit 06 (6.1–6.3) ගණන් පුරුදු වෙන්න',bl:1},
+  {ti:'Unit 01 flash cards + revision',d:'Cards හදන ගමන්ම පාඩම revise වෙනවා. ප්‍රශ්න ටික ET quiz app එකටත්.',bl:1}],
+ [{ti:'Unit 03 flash cards + revision',bl:1},{ti:'Unit 01 short note + paper',bl:1}],
+ [{ti:'Unit 05 flash cards + revision',bl:1},{ti:'Unit 03 short note + paper',bl:1}],
+ [{ti:'Unit 06 flash cards + revision',bl:1},{ti:'Unit 05 short note + paper',bl:1}],
+ [{ti:'Unit 06 short note + paper',bl:1},{ti:'Units 01–06 mixed paper + දුර්වල කොටස්',k:'now'}]
+];
+const ICT_TUE=[
+ {ti:'Unit 03 notes ලියන්න — 1 කොටස',d:'දැනට උගන්නපු කොටස. ගණන් කරන්න කලින් මේක ඉවර වෙන්න ඕන.',bl:1},
+ {ti:'Unit 03 notes ඉවර කරන්න',bl:1},
+ {ti:'Unit 02 short note',d:'පිටු 2–3: definitions, වැදගත් කරුණු, MCQ වල වැරදුණු තැන්.',bl:1},
+ {ti:'Past paper book — Unit 03 (2 කොටස) + විවරණ',bl:1},
+ {ti:'Past paper book — Unit 04 (2 කොටස) + විවරණ',bl:1},
+ {ti:'Unit 03 short note',k:'now'},
+ {ti:'ICT recording 3 — 1 කොටස + notes',bl:1}
+];
+const ICT_THU=[
+ [{ti:'Unit 01 full paper ආයේ කරලා වැරදි හදාගන්න',d:'වැරදුණු ප්‍රශ්න විතරක් ආයේ කරන්න.',bl:1},{ti:'Unit 02 full paper ආයේ කරලා වැරදි හදාගන්න',d:'වැරදුණු ප්‍රශ්න විතරක් ආයේ කරන්න.',bl:1}],
+ [{ti:'Unit 03 ගණන් practice',d:'Notes ඉවර නිසා දැන් ගණන් කරන්න පුළුවන්.',bl:1},{ti:'Unit 01 short note + flash cards',d:'Flash card ප්‍රශ්න ICT quiz app එකටත්.',bl:1}],
+ [{ti:'Past paper book — Unit 03 (1 කොටස) + විවරණ',bl:1},{ti:'Unit 02 flash cards + app එකට',bl:1}],
+ [{ti:'Past paper book — Unit 04 (1 කොටස) + විවරණ',bl:1},{ti:'Unit 03 ගණන් practice — 2',k:'now'}],
+ [{ti:'ICT recording 1 (ඉස්සරහ පාඩම) + notes',d:'1.5–2x speed. Slides තියෙනවා නම් ඒවා පැත්තකින් තියාගෙන.',bl:1},{ti:'Unit 01 + Unit 02 පාඩම් papers',k:'now'}],
+ [{ti:'ICT recording 2 + notes',bl:1},{ti:'Unit 03 flash cards + app එකට',k:'now'}],
+ [{ti:'ICT recording 3 ඉවර කරලා notes',bl:1},{ti:'Units 01–03 mixed paper + දුර්වල කොටස්',k:'now'}]
+];
+const MAG=[
+ {ti:'Magazine: group එකත් එක්ක පිටු 8 බෙදාගන්න + මගේ පිටු වල layout sketch',d:'කාටද මොන පිටුව කියලා group chat එකේ ලියලා තියන්න. Fonts සහ පාට ටිකත් එකඟ වෙන්න.'},
+ {ti:'Magazine: මගේ පිටු design කරන්න (Photoshop / Illustrator)'},
+ {ti:'Magazine: මගේ පිටු ඉවර + group එකේ පිටු එකතු කරන්න',d:'Final file එක මේ සතියේම හදාගන්න. ඊළඟ ඉරිදා polish කරන්න විතරයි.'},
+ {ti:'Magazine: final check, export, submit',d:'Deadline අද (නොවැ 8). Export කරලා group එකට share කරන්න.'}
+];
+const HEX_SUN=[
+ {ti:'Hexora site: team එකට කොටස් බෙදලා ඉතුරු වැඩ ලැයිස්තුව හදන්න',d:'උඹ කරන්නේ admin panel සහ quote calculator විතරයි. අනිත් පිටු team එකට.'},
+ {ti:'Hexora site: Services + Pricing පිටු (USD / LKR) review'},
+ {ti:'Hexora site: Project request form + quote calculator'},
+ {ti:'Hexora site: Admin panel (requests + quotes)'},
+ {ti:'Hexora site: testing (phone + desktop) + Singlish text check'},
+ {ti:'Hexora site: launch කරලා customersලාට link එක share කරන්න'},
+ {ti:'A/L Tech Notes app: screens plan + project setup',d:'උඹේ short notes තමා content එක. Coding ඊළඟ මාසෙ.'}
+];
+
+/* ---------- build plan ---------- */
+const PLAN={}, ORDER=[];
+(function build(){
+  let sq=0,eq=0,tue=0,thu=0,sun=0,cls=0,dp=0;
+  const OLDN={0:4,1:2,2:2,3:2,4:2,5:0,6:0};
+  for(let iso=START;iso<=END;iso=isoAdd(iso,1)){
+    const w=dow(iso), wk=Math.floor(diff(START,iso)/7)+1, L=[];
+    const P=(o)=>{L.push(o);return o};
+    const Q=(item,s,t,e,ap)=>P(Object.assign({s,k:item.bl?'old':(item.k||'now'),t,e,ap},item));
+    const REST=(t,e,ti)=>P({s:'rev',k:'rest',fx:1,t,e,ap:'pm',ti:ti||'විවේකය + කෑම'});
+    const clsT=(n,t,e)=>{const a=cls+1;if(a>27)return P({s:'ict',k:'now',t,e,ap:'pm',ti:'ICT: වැරදුණු MCQ ප්‍රශ්න revision',d:'පරණ class papers ඔක්කොම ඉවරයි. දැන් විවරණ ලියපු ප්‍රශ්න ආයේ බලන්න.'});
+      const b=Math.min(cls+n,27);cls=b;const c=b-a+1;
+      return P({s:'ict',k:'old',bl:1,t,e,ap:'pm',mc:{c},ti:'පරණ class MCQ papers '+(a===b?'#'+a:'#'+a+'–#'+b),d:'ප්‍රශ්න '+(c*7)+'ක්. ප්‍රශ්නයට විනාඩි 1ක් වගේ. වැරදුණු / අනුමාන කරපු ඒවට විතරක් විවරණය.'})};
+    const daily=(late)=>{
+      if(late){P({s:'ict',k:'daily',t:'11:10',e:'11:30',ap:'pm',ti:'රෑ 10 ICT paper + විවරණය',d:'Diploma පන්තිය නිසා අද පරක්කුයි. අද paper එක විතරක්. Daily quiz app එකට දාන්න.'});return}
+      P({s:'ict',k:'daily',t:'10:00',e:'10:30',ap:'pm',ti:'රෑ 10 ICT paper + විවරණය',d:'ප්‍රශ්න 5. වැරදුණු/අනුමාන ප්‍රශ්න වලට විතරක් විවරණය. ඒකම Daily quiz app එකට දාන්න.'});
+      const n=OLDN[w];if(n&&dp<72){const a=dp+1,b=Math.min(dp+n,72);dp=b;const c=b-a+1;
+        P({s:'ict',k:'old',bl:1,mc:{d:c},t:'10:30',e:c>2?'11:15':'10:55',ap:'pm',ti:'පරණ Day papers '+(a===b?'#'+a:'#'+a+'–#'+b),d:'ප්‍රශ්න '+(c*5)+'ක්. විවරණය ලියලා Day papers app එකට දාන්න.'})}
+    };
+    if(iso===START){
+      P({s:'ict',k:'old',t:'අද',e:'',ap:'',ti:'IT class past papers book එක ඉවර කරන්න',d:'අද මේක ඉවර කරලා හෙට (ඔක් 13) ඉඳන් plan එක පටන් ගන්න.'});
+      P({s:'ict',k:'rev',t:'රෑ',e:'',ap:'',ti:'හෙට ICT පන්තියට ලෑස්ති වෙන්න',d:'හෙට ඉඳන් රෑ 10 paper එක හැමදාම කරනවා. Daily quiz app එක ලෑස්ති කරගන්න.'});
+    } else if(w===1||w===5){ // SFT
+      const it=SFT_Q[sq++]||SFT_Q[SFT_Q.length-1];
+      Q(it[0],'sft','3:30','5:30','pm');
+      if(w===1){REST('5:30','6:30');Q(it[1],'sft','6:30','8:30','pm');
+        if(wk>=8)P({s:'dip',k:'rev',t:'8:45',e:'9:45',ap:'pm',ti:'Balance check — Diploma',d:'පාඩම් 6ටම notes තියෙනවද බලලා ඉතුරු ලැයිස්තුව හදන්න.'});
+        else P({s:'dip',k:'old',bl:1,t:'8:45',e:'9:45',ap:'pm',ti:'Diploma පාඩම '+(wk-1)+': notes review + පාඩම් කරන්න',d:'ඊයේ ඉරිදා හදපු notes එක කියවලා වැදගත් කරුණු පාඩම් කරන්න.'});
+        daily(false);
+      } else {REST('5:30','6:00');Q(it[1],'sft','6:00','7:30','pm');
+        P({s:'dip',k:'cls',fx:1,t:'8:00',e:'11:00',ap:'pm',ti:'Diploma පන්තිය (live)',d:'පන්තියේදීම කෙටි notes ලියාගන්න. ඉරිදා සම්පූර්ණ කරනවා.'});
+        daily(true);}
+    } else if(w===2){ // ICT Tuesday
+      P({s:'ict',k:'cls',fx:1,t:'3:00',e:'5:30',ap:'pm',ti:'ICT පන්තිය',d:'පන්ති MCQ paper එක (ප්‍රශ්න 7) පන්තියේදීම කරන්න.'});
+      REST('5:30','6:30');
+      P({s:'ict',k:'now',t:'6:30',e:'7:15',ap:'pm',ti:'අද class paper එකේ විවරණය',d:'වැරදුණු සහ අනුමාන කරපු ප්‍රශ්න වලට. ඒ ප්‍රශ්නම app එකට.'});
+      P({s:'ict',k:'now',t:'7:15',e:'8:00',ap:'pm',ti:'අද උගන්නපු කොටසේ notes සම්පූර්ණ කරන්න'});
+      clsT(2,'8:00','8:45');
+      Q(ICT_TUE[tue++]||{ti:'ICT revision',k:'now'},'ict','8:45','9:45','pm');
+      daily(false);
+    } else if(w===3){ // ET
+      const it=ET_Q[eq++]||ET_Q[ET_Q.length-1];
+      Q(it[0],'et','3:30','5:30','pm');REST('5:30','6:30');Q(it[1],'et','6:30','8:30','pm');
+      const hx=iso==='2026-10-14'?{ti:'Quiz apps maintenance + ICT apps වලට papers දාන ක්‍රමය ලේසි කරන්න',d:'Daily quiz / Day papers apps දෙකට ප්‍රශ්න ඉක්මනට දාන්න admin form එකක් හැදුවොත් හැමදාම විනාඩි 5න් වැඩේ ඉවරයි.'}
+        :iso==='2026-11-25'?{ti:'A/L Tech Notes app: idea + features ලැයිස්තුව'}
+        :{ti:'ET / SFT quiz apps: මේ සතියේ flash card ප්‍රශ්න add + maintenance'};
+      P(Object.assign({s:'hex',k:'now',t:'8:45',e:'9:45',ap:'pm'},hx));
+      daily(false);
+    } else if(w===4){ // ICT Thursday
+      const it=ICT_THU[thu++]||ICT_THU[ICT_THU.length-1];
+      clsT(3,'3:30','4:15');
+      Q(it[0],'ict','4:15','5:45','pm');REST('5:45','6:30');Q(it[1],'ict','6:30','8:30','pm');
+      if(wk<=6)P({s:'dip',k:'old',bl:1,t:'8:45',e:'9:45',ap:'pm',ti:'Diploma පාඩම '+wk+': slides/PDF වලින් notes skeleton',d:'Recording බලන්න කලින් slides වලින් headings සහ වැදගත් කරුණු ලියාගන්න. එතකොට recording එකේ බලන්න ඕන තැන් විතරක් පේනවා.'});
+      else P({s:'dip',k:'old',t:'8:45',e:'9:45',ap:'pm',ti:'Diploma: ඉතුරු recordings / notes'});
+      daily(false);
+    } else if(w===6){ // Saturday
+      P({s:'et',k:'cls',fx:1,t:'7:30',e:'9:30',ap:'am',ti:'ET පන්තිය'});
+      P({s:'sft',k:'cls',fx:1,t:'10:00',e:'12:00',ap:'am',ti:'SFT පන්තිය',d:iso==='2026-10-24'?'Unit 04 flash cards අද ගෙනියන්න.':''});
+      P({s:'et',k:'now',t:'1:30',e:'3:30',ap:'pm',ti:iso==='2026-10-17'?'Unit 06 (6.4 සිට) notes සම්පූර්ණ + tute':'අද ET පන්තියේ notes සම්පූර්ණ + tute',d:'පන්තියේ දේ එදාම. මේක කළොත් ET වල අලුත් backlog එකක් හැදෙන්නේ නෑ.'});
+      P({s:'sft',k:'now',t:'4:00',e:'5:30',ap:'pm',ti:'අද SFT පන්තියේ notes + Unit 01/03 tute',d:'පන්තිය ගිය තැනට.'});
+      if(iso==='2026-10-17')P({s:'sft',k:'old',bl:1,t:'5:30',e:'6:15',ap:'pm',ti:'Unit 04 flash cards වලට ප්‍රශ්න/උත්තර ලැයිස්තුව',d:'Card 30–40ට ඕන ප්‍රශ්න ටික notes එකෙන් තෝරලා ලියාගන්න. ඊළඟ සිකුරාදා cards හදන්න ලේසියි.'});
+      P({s:'dip',k:'cls',fx:1,t:'8:00',e:'11:00',ap:'pm',ti:'Diploma පන්තිය (live)'});
+      daily(true);
+    } else if(w===0){ // Sunday
+      const i=sun++;
+      if(i<4){P(Object.assign({s:'asg',k:i===3?'now':'now',t:'8:00',e:'10:30',ap:'am',bl:1},MAG[i]));
+        P({s:'asg',k:'now',bl:1,t:'10:30',e:'12:00',ap:'am',ti:i===0?'දැන් තියෙන diploma assignments ලැයිස්තුව + deadlines ලියාගන්න':'Deadline ළඟම diploma assignment එක'});}
+      else P({s:'asg',k:'now',bl:1,t:'8:00',e:'12:00',ap:'am',ti:'Diploma assignments (deadline ළඟම ඒවා මුලින්)'});
+      P({s:'dip',k:'now',t:'1:30',e:'2:15',ap:'pm',ti:'මේ සතියේ Diploma පන්ති notes (සිකු + සෙන)'});
+      if(wk<=6)P({s:'dip',k:'old',bl:1,t:'2:15',e:'4:30',ap:'pm',ti:'Diploma පාඩම '+wk+': වැදගත් recordings (2x) + notes සම්පූර්ණ',d:'බ්‍රහස්පතින්දා හදපු skeleton එකේ හිස් තැන් වලට අදාළ කොටස් විතරක් බලන්න.'});
+      else P({s:'dip',k:'old',bl:1,t:'2:15',e:'4:30',ap:'pm',ti:'Diploma පාඩම් 1–6 notes check + revision'});
+      P(Object.assign({s:'hex',k:'now',bl:1,t:'5:00',e:'7:00',ap:'pm'},HEX_SUN[i]||HEX_SUN[HEX_SUN.length-1]));
+      P({s:'rev',k:'rev',t:'7:30',e:'8:30',ap:'pm',ti:'සතියේ review + මඟ ඇරුණු වැඩ',d:'"අද" tab එකේ මඟ ඇරුණු ලැයිස්තුවෙන් පුළුවන් තරම් කරන්න. ඊළඟ සතිය බලලා ලෑස්ති වෙන්න.'});
+      daily(false);
+    }
+    L.forEach((t,i)=>{t.id=iso+'-'+i;t.date=iso;
+      t.h=(t.t&&t.e&&t.ap)?(()=>{let a=mins(t.t,t.ap),b=mins(t.e,t.ap);if(b<a)b+=12*60;return (b-a)/60})():0;});
+    PLAN[iso]={iso,w,wk,tasks:L};ORDER.push(iso);
+  }
+})();
+const ALL=ORDER.flatMap(d=>PLAN[d].tasks);
+const CHECKABLE=ALL.filter(t=>!t.fx&&t.k!=='rest');
+
+Object.keys(SUBJ).forEach(k=>{SUBJ[k].c='var(--'+k+')';SUBJ[k].c2='var(--'+k+'2)'});
+
+/* ---------- icons ---------- */
+const sv=(p,f)=>`<svg viewBox="0 0 24 24" fill="${f?'currentColor':'none'}" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${p}</svg>`;
+const IC={
+  today:sv('<path d="M3 10.5 12 3l9 7.5V20a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/>'),
+  week:sv('<rect x="3" y="4.5" width="18" height="16.5" rx="3"/><path d="M3 9.5h18M8 2.5v4M16 2.5v4M7.5 13.5h2M11 13.5h2M14.5 13.5h2M7.5 17h2M11 17h2"/>'),
+  progress:sv('<path d="M4 20V13M10 20V6M16 20v-9M22 20H2"/><path d="M4 9l6-4 6 4 5-5" opacity=".55"/>'),
+  rules:sv('<path d="M5 4.5A1.5 1.5 0 0 1 6.5 3H19v16H6.5A1.5 1.5 0 0 0 5 20.5z"/><path d="M5 20.5A1.5 1.5 0 0 0 6.5 22H19v-3M9 7.5h6M9 11h4"/>'),
+  old:sv('<path d="M3.5 12a8.5 8.5 0 1 0 2.6-6.1L3.5 8.5"/><path d="M3.5 3.5v5h5M12 7.5V12l3 2"/>'),
+  now:sv('<path d="M13 2 4.5 13.5H11L10 22l8.5-11.5H12z"/>'),
+  cls:sv('<path d="M2 9.5 12 4.5l10 5-10 5z"/><path d="M6 11.5V16c3.5 2.5 8.5 2.5 12 0v-4.5M22 9.5V15"/>'),
+  daily:sv('<circle cx="12" cy="13" r="8.5"/><path d="M12 8.5V13l3 2M9.5 2.5h5"/>'),
+  rev:sv('<path d="M10 6h10M10 12h10M10 18h10M3.5 6l1.3 1.3L7.3 4.8M3.5 12l1.3 1.3 2.5-2.5M3.5 18l1.3 1.3 2.5-2.5"/>'),
+  rest:sv('<path d="M4 8.5h13V14a5 5 0 0 1-5 5H9a5 5 0 0 1-5-5z"/><path d="M17 10h1.5a2.5 2.5 0 0 1 0 5H17M8 2.5v3M12 2.5v3"/>'),
+  left:sv('<path d="M15 6l-6 6 6 6"/>'),right:sv('<path d="M9 6l6 6-6 6"/>'),down:sv('<path d="M6 9l6 6 6-6"/>'),
+  sun:sv('<circle cx="12" cy="12" r="4"/><path d="M12 2.5v2M12 19.5v2M2.5 12h2M19.5 12h2M5.2 5.2l1.4 1.4M17.4 17.4l1.4 1.4M5.2 18.8l1.4-1.4M17.4 6.6l1.4-1.4"/>'),
+  moon:sv('<path d="M20.5 14.6A8.5 8.5 0 0 1 9.4 3.5a8.5 8.5 0 1 0 11.1 11.1z"/>'),
+  star:sv('<path d="M12 3l2.7 5.6 6.1.8-4.5 4.2 1.1 6.1L12 16.8l-5.4 2.9 1.1-6.1-4.5-4.2 6.1-.8z"/>')
+};
+const KIND_IC={old:'old',now:'now',cls:'cls',daily:'daily',rev:'rev',rest:'rest'};
+const TABS=[['today','අද'],['week','සතිය'],['progress','ප්‍රගතිය'],['rules','ක්‍රමය']];
+const SKINS=[['light','Light','sun'],['dark','Dark','moon'],['black','Black','star']];
+
+/* ---------- state ---------- */
+const LS='balance-plan-v1';
+let state={done:{}};
+try{const s=JSON.parse(localStorage.getItem(LS)||'null');if(s&&s.done)state.done=s.done}catch(e){}
+let ui={tab:'today',sel:null,wk:null,collapsed:false,skin:'auto'};
+try{const u=JSON.parse(localStorage.getItem(LS+'-ui')||'null');if(u){if(u.tab)ui.tab=u.tab==='backlog'?'progress':u.tab;ui.collapsed=!!u.collapsed;if(u.skin)ui.skin=u.skin}}catch(e){}
+if(!TABS.some(t=>t[0]===ui.tab))ui.tab='today';
+const TODAY=todayISO();
+const clampDay=d=>d<START?START:d>END?END:d;
+ui.sel=clampDay(TODAY);
+const saveLocal=()=>{try{localStorage.setItem(LS,JSON.stringify(state))}catch(e){}};
+const saveUi=()=>{try{localStorage.setItem(LS+'-ui',JSON.stringify({tab:ui.tab,collapsed:ui.collapsed,skin:ui.skin}))}catch(e){}};
+function nowMins(){try{const p=new Intl.DateTimeFormat('en-GB',{timeZone:'Asia/Colombo',hour:'2-digit',minute:'2-digit',hour12:false}).formatToParts(new Date());
+  const h=+p.find(x=>x.type==='hour').value%24,m=+p.find(x=>x.type==='minute').value;return h*60+m}catch(e){const d=new Date();return d.getHours()*60+d.getMinutes()}}
+
+/* ---------- sync ---------- */
+let dbRef=null,saving=false,dirty=false,timer=null;
+function setSync(ok){const el=document.getElementById('sync');el.className='sync fade'+(ok?' ok':'');
+  el.querySelector('span').textContent=ok?'ඔක්කොම device වල සුරැකෙනවා':'මේ device එකේ සුරැකෙනවා';}
+function queueSave(){dirty=true;clearTimeout(timer);timer=setTimeout(flush,700)}
+async function flush(){if(!dbRef||saving)return;saving=true;dirty=false;
+  try{await dbRef.set({done:state.done,updated:Date.now()});setSync(true)}
+  catch(e){if(e&&e.code==='unavailable'){setTimeout(()=>{dirty=true;flush()},1500+Math.random()*1000)}else setSync(false)}
+  saving=false;if(dirty)flush();}
+async function initDb(){try{
+  if(!window.claude||!window.claude.use)return;
+  const db=await window.claude.use('db');if(!db)return;
+  dbRef=db.doc('progress/main');let first=true;
+  dbRef.onSnapshot(s=>{
+    if(s.metadata&&s.metadata.hasPendingWrites)return;
+    const remote=(s.exists&&s.data()&&s.data().done)||{};
+    if(first){first=false;setSync(true);
+      if(!s.exists){if(Object.keys(state.done).length)queueSave();return}
+      const extra=Object.keys(state.done).some(k=>!remote[k]);
+      const changed=Object.keys(remote).some(k=>!state.done[k]);
+      state.done=Object.assign({},remote,state.done);saveLocal();if(changed)render(true);if(extra)queueSave();return;}
+    if(!dirty&&!saving){const same=JSON.stringify(Object.keys(remote).sort())===JSON.stringify(Object.keys(state.done).sort());
+      state.done=Object.assign({},remote);saveLocal();if(!same)render(true);}
+  },()=>setSync(false));
+}catch(e){}}
+
+/* ---------- metrics ---------- */
+const MCQ_TOTAL=27*7+72*5;
+function metric(key){
+  const [kind,arg]=key.split(':');let list;
+  if(kind==='day')list=PLAN[arg].tasks.filter(t=>!t.fx&&t.k!=='rest');
+  else if(kind==='all')list=CHECKABLE;
+  else if(kind==='bl')list=ALL.filter(t=>t.bl&&!t.fx);
+  else if(kind==='subj')list=ALL.filter(t=>t.s===arg&&t.bl);
+  else if(kind==='mcqc'||kind==='mcqd'){const f=kind==='mcqc'?'c':'d',tot=kind==='mcqc'?27:72;let a=0;ALL.forEach(t=>{if(t.mc&&t.mc[f]&&state.done[t.id])a+=t.mc[f]});return {a,b:tot,p:Math.round(a/tot*100)}}
+  else if(kind==='mcqleft'){let l=MCQ_TOTAL;ALL.forEach(t=>{if(t.mc&&state.done[t.id])l-=(t.mc.c||0)*7+(t.mc.d||0)*5});return {a:l,b:MCQ_TOTAL,p:Math.round((MCQ_TOTAL-l)/MCQ_TOTAL*100)}}
+  else if(kind==='time'){const a=diff(START,clampDay(TODAY)),b=diff(START,END);return {a:Math.max(0,diff(TODAY,END)),b,p:Math.round(a/b*100)}}
+  const a=list.filter(t=>state.done[t.id]).length;return {a,b:list.length,p:list.length?Math.round(a/list.length*100):0};
+}
+function ringSVG(key,size,c){const r=size==='big'?44:15.5,vb=size==='big'?104:38,C=2*Math.PI*r,sw=size==='big'?9:4;
+  return `<div class="ring ${size}" data-ring="${key}" style="${c?'--rc:'+c:''}"><svg viewBox="0 0 ${vb} ${vb}"><circle class="rb" cx="${vb/2}" cy="${vb/2}" r="${r}" stroke-width="${sw}"/>
+  <circle class="rf" cx="${vb/2}" cy="${vb/2}" r="${r}" stroke-width="${sw}" stroke="${c||'var(--ok)'}" stroke-dasharray="${C.toFixed(2)}" stroke-dashoffset="${C.toFixed(2)}" data-c="${C.toFixed(2)}"/></svg><span class="rv">0%</span></div>`}
+function refresh(){
+  document.querySelectorAll('[data-ring]').forEach(el=>{const m=metric(el.dataset.ring),f=el.querySelector('.rf');const C=+f.dataset.c;
+    f.style.strokeDashoffset=(C*(1-m.p/100)).toFixed(2);el.querySelector('.rv').textContent=m.p+'%'});
+  document.querySelectorAll('[data-bar]').forEach(el=>{el.style.width=metric(el.dataset.bar).p+'%'});
+  document.querySelectorAll('[data-frac]').forEach(el=>{const m=metric(el.dataset.frac);el.textContent=m.a+'/'+m.b});
+  document.querySelectorAll('[data-pct]').forEach(el=>{el.textContent=metric(el.dataset.pct).p+'%'});
+  document.querySelectorAll('[data-num]').forEach(el=>{const v=metric(el.dataset.num).a;countTo(el,v)});
+}
+function countTo(el,v){const from=+(el.dataset.v||0);el.dataset.v=v;if(from===v){el.textContent=v;return}
+  if(matchMedia('(prefers-reduced-motion: reduce)').matches){el.textContent=v;return}
+  const t0=performance.now(),d=900;const step=t=>{const k=Math.min(1,(t-t0)/d),e=1-Math.pow(1-k,3);el.textContent=Math.round(from+(v-from)*e);if(k<1)requestAnimationFrame(step)};requestAnimationFrame(step)}
+
+function toggle(id,btn){
+  const on=!state.done[id];if(on)state.done[id]=1;else delete state.done[id];saveLocal();queueSave();
+  document.querySelectorAll('[data-tid="'+id+'"]').forEach(el=>{el.classList.toggle('done',on);const b=el.querySelector('.chk');if(b)b.setAttribute('aria-pressed',on)});
+  if(on&&btn){const host=btn.closest('[data-tid]');const bs=document.createElement('span');bs.innerHTML=BURST;const node=bs.firstChild;btn.appendChild(node);
+    if(host){host.classList.remove('pop');void host.offsetWidth;host.classList.add('pop')}setTimeout(()=>{node.remove();host&&host.classList.remove('pop')},760)}
+  refresh();
+}
+
+/* ---------- pieces ---------- */
+const apTxt=ap=>ap==='am'?'පෙ.ව.':ap==='pm'?'ප.ව.':'';
+const BURST='<span class="burst">'+[0,45,90,135,180,225,270,315].map((a,i)=>`<i style="--a:${a}deg;--bc:${['var(--ok)','var(--sft)','var(--ict)','var(--dip)'][i%4]}"></i>`).join('')+'</span>';
+function chkBtn(t,done){return `<button class="chk" data-id="${t.id}" aria-pressed="${done}" aria-label="ඉවරයි කියලා ලකුණු කරන්න"><svg class="cs" viewBox="0 0 42 42"><circle class="cb" cx="21" cy="21" r="18.5"/><circle class="cf" cx="21" cy="21" r="19.8"/><path class="cm" d="M13.5 21.5l5 5 10-10.5"/></svg></button>`}
+function isLive(t){if(t.date!==TODAY||!t.ap||!t.e)return false;const n=nowMins();let a=mins(t.t,t.ap),b=mins(t.e,t.ap);if(b<a)b+=720;return n>=a&&n<b}
+function taskCard(t,i,opts){opts=opts||{};const S=SUBJ[t.s],done=!!state.done[t.id];
+  if(t.k==='rest')return `<div class="rest stag" style="--i:${i}">${IC.rest}<span class="mono">${t.t}–${t.e}</span><span>${esc(t.ti)}</span></div>`;
+  const live=!opts.showDate&&isLive(t);
+  const time=t.e?`${t.t} – ${t.e}<small>${apTxt(t.ap)}</small>`:esc(t.t);
+  return `<article class="tk stag ${t.fx?'fixed':''} ${done?'done':''} ${live?'live':''}" data-tid="${t.id}" style="--c:${S.c};--c2:${S.c2};--i:${i}">
+    <div class="ico">${IC[KIND_IC[t.k]]||IC.now}</div>
+    <div class="tb"><div class="r1"><span class="tm">${time}</span><span class="pill">${S.n}</span><span class="kind ${t.k==='old'?'old':''}">${KIND[t.k]||''}</span>
+      ${opts.showDate?`<span class="kind">· ${fmt(t.date)} ${DSH[dow(t.date)]}</span>`:''}${live?'<span class="live-b">දැන්</span>':''}</div>
+      <h4><span>${esc(t.ti)}</span></h4>${t.d?`<p>${esc(t.d)}</p>`:''}</div>
+    ${chkBtn(t,done)}<span class="glow"><i></i></span></article>`}
+function dayKey(d){return d===START?['පරණ වැඩ ඉවර කරන දවස','ict']:DAYTYPE[dow(d)]}
+function weekStart(iso){const w=dow(iso);return isoAdd(iso,w===0?-6:1-w)}
+
+/* ---------- views ---------- */
+function stripHTML(iso,cls){
+  const [,key]=dayKey(iso),S=SUBJ[key];const ws=weekStart(iso);let strip='',idx=0;
+  for(let i=0;i<7;i++){const d=isoAdd(ws,i),ok=PLAN[d];if(d===iso)idx=i;const k=ok?dayKey(d)[1]:'rev';
+    strip+=`<button class="sd ${d===TODAY?'is-today':''}" data-day="${d}" ${ok?'':'disabled'} aria-current="${d===iso}" style="--dc:${SUBJ[k].c}">
+      <small>${DSH[dow(d)]}</small><b>${+d.slice(8)}</b><span class="dot"></span><span class="pr"><i ${ok?`data-bar="day:${d}"`:''} style="width:0"></i></span></button>`}
+  return `<div class="strip ${cls||'stag'}" style="--i:0;--n:${idx};--c:${S.c};--c2:${S.c2}"><span class="ind"></span>${strip}</div>`;
+}
+function viewToday(){return stripHTML(ui.sel)+'<p class="swipe-hint">← swipe කරලා දවස් මාරු කරන්න →</p><div id="dayBody">'+dayBodyHTML(ui.sel)+'</div>'}
+function dayBodyHTML(iso){
+  const P=PLAN[iso],[lbl,key]=dayKey(iso),S=SUBJ[key];
+  const work=P.tasks.filter(t=>!t.fx&&t.k!=='rest');
+  const hrs=P.tasks.filter(t=>t.k!=='rest').reduce((s,t)=>s+t.h,0);
+  let next=null;if(iso===TODAY){const n=nowMins();next=work.find(t=>!state.done[t.id]&&(!t.ap||(()=>{let a=mins(t.t,t.ap),b=mins(t.e,t.ap);if(b<a)b+=720;return b>n})()))}
+  else if(iso>TODAY)next=work[0];
+  const rel=iso===TODAY?'අද':iso<TODAY?'දින '+diff(iso,TODAY)+'කට කලින්':'දින '+diff(TODAY,iso)+'කින්';
+  return `
+  <section class="dhero stag" style="--i:1;--c:${S.c};--c2:${S.c2}">
+    <div class="dh-top"><span class="eyebrow">${DAYS[P.w]} · ${fmtLong(iso)} · ${rel}</span>
+      <div class="dh-nav"><button class="nb" data-nav="-1" ${iso<=START?'disabled':''} aria-label="කලින් දවස">${IC.left.replace('<svg','<svg width="16" height="16"')}</button>
+      ${iso!==clampDay(TODAY)?'<button class="nb" data-goto="today">අදට</button>':''}
+      <button class="nb" data-nav="1" ${iso>=END?'disabled':''} aria-label="ඊළඟ දවස">${IC.right.replace('<svg','<svg width="16" height="16"')}</button></div></div>
+    <div class="dh-main"><div style="min-width:0">
+      <h2 class="dh-title">${lbl}</h2>
+      <p class="dh-sub">වැඩ <b data-frac="day:${iso}">0/${work.length}</b> ඉවරයි · පැය ${Math.round(hrs*2)/2}ක දවසක්</p>
+      ${next?`<div class="dh-next"><span class="lbl">${iso===TODAY?'ඊළඟට':'පළමුවෙන්'}</span><span class="mono" style="font-size:12px">${next.t}</span><span>${esc(next.ti)}</span></div>`
+        :(work.length&&iso<=TODAY?`<div class="dh-next"><span class="lbl">සුපිරි</span><span>${iso===TODAY?'අද වැඩ ඔක්කොම ඉවරයි, හෝ ඉතුරු ඒවා ප්‍රගතිය tab එකේ.':'මේ දවසේ ඉතුරු වැඩ ප්‍රගතිය tab එකේ "මඟ ඇරුණු" ලැයිස්තුවේ තියෙනවා.'}</span></div>`:'')}
+    </div>${ringSVG('day:'+iso,'big','url(#rg)')}</div>
+  </section>
+  <svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs><linearGradient id="rg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="${S.c}"/><stop offset="1" stop-color="${S.c2}"/></linearGradient></defs></svg>
+  <div class="tl">${P.tasks.map((t,i)=>taskCard(t,i+2)).join('')}</div>`;
+}
+function viewWeek(){
+  const ws=ui.wk||weekStart(clampDay(TODAY));let cards='',n=0;
+  for(let i=0;i<7;i++){const d=isoAdd(ws,i),P=PLAN[d];if(!P)continue;const [lbl,key]=dayKey(d),S=SUBJ[key];
+    cards+=`<article class="wday stag ${d===TODAY?'is-today':''}" style="--i:${n++};--c:${S.c};--c2:${S.c2}">
+      <header data-open="${d}"><div><b>${DAYS[P.w]} · ${fmt(d)}</b><small>${lbl}</small></div>${ringSVG('day:'+d,'sm',S.c)}</header>
+      ${P.tasks.filter(t=>t.k!=='rest').map(t=>{const dn=!!state.done[t.id];return `<div class="mini ${dn?'done':''} ${t.fx?'fixed':''}" data-tid="${t.id}" style="--c:${SUBJ[t.s].c};--c2:${SUBJ[t.s].c2}">
+        <span class="tmn">${t.t||''}</span><span class="tx"><i></i><span>${esc(t.ti)}</span></span>${chkBtn(t,dn)}</div>`}).join('')}
+      <button class="open" data-open="${d}">මේ දවස විවෘත කරන්න →</button></article>`}
+  const first=weekStart(START),last=weekStart(END),wn=Math.floor(diff(first,ws)/7)+1;
+  return `<div class="wkhead stag" style="--i:0">
+    <button class="nb" data-wk="-7" ${ws<=first?'disabled':''} aria-label="කලින් සතිය">${IC.left.replace('<svg','<svg width="16" height="16"')}</button>
+    <div class="tt"><h2>සතිය ${Math.min(wn,8)}</h2><p>${fmt(ws<START?START:ws)} – ${fmt(isoAdd(ws,6)>END?END:isoAdd(ws,6))}</p></div>
+    ${ws!==weekStart(clampDay(TODAY))?'<button class="nb" data-goto="thisweek">මේ සතිය</button>':''}
+    <button class="nb" data-wk="7" ${ws>=last?'disabled':''} aria-label="ඊළඟ සතිය">${IC.right.replace('<svg','<svg width="16" height="16"')}</button>
+  </div><div class="weekgrid">${cards}</div>`;
+}
+function viewProgress(){
+  const DL=[['2026-10-24','SFT Unit 04 flash cards','සෙනසුරාදා පන්තියට','sft'],['2026-11-08','Mini Magazine submit','DIT10603 group assignment','asg'],
+    ['2026-11-22','Hexora site launch','team එකත් එක්ක','hex'],['2026-11-23','පරණ MCQ papers ඉවරයි','class 27 + day 72','ict'],['2026-11-30','Balance','පරණ වැඩ ඉවරයි','et']];
+  const dls=DL.map(([d,t,s,k],i)=>{const n=diff(TODAY,d);return `<div class="dl stag ${n<0?'past':''}" style="--i:${i+1};--c:${SUBJ[k].c};--c2:${SUBJ[k].c2}"><span class="n">${n<0?'✓':n}</span>
+    <span class="t">${t}<small>${fmt(d)} · ${n<0?'ඉවරයි':n===0?'අද':'දින '+n+'කින්'} · ${s}</small></span></div>`}).join('');
+  const missed=CHECKABLE.filter(t=>t.date<TODAY&&!state.done[t.id]);
+  const groups=['sft','et','ict','dip','asg','hex'];
+  const sub={sft:'Unit 02, 04 + short notes, papers',et:'Units 01, 03, 05, 06',ict:'Units 01–03, MCQ, past paper book',dip:'පාඩම් 6 · recordings ~80',asg:'Magazine + අනිත් assignments',hex:'Customer site + apps'};
+  const gi={sft:'old',et:'old',ict:'daily',dip:'cls',asg:'now',hex:'now'};
+  const cards=groups.map((g,i)=>{const S=SUBJ[g];const items=ALL.filter(t=>t.s===g&&t.bl&&!t.mc);
+    const meters=g==='ict'?`<div class="meter"><span>පරණ class MCQ papers</span><span class="mono" data-frac="mcqc">0/27</span><span class="gbar"><i data-bar="mcqc" style="width:0"></i></span>
+      <span>පරණ Day papers</span><span class="mono" data-frac="mcqd">0/72</span><span class="gbar"><i data-bar="mcqd" style="width:0"></i></span></div>`:'';
+    return `<section class="card bcard stag" style="--i:${i+3};--c:${S.c};--c2:${S.c2}">
+      <div class="bhead"><span class="ico">${IC[gi[g]]}</span><div><h3>${S.n}</h3><small>${sub[g]}</small></div>${ringSVG('subj:'+g,'sm',S.c)}</div>
+      ${meters}${items.map(t=>{const dn=!!state.done[t.id],late=!dn&&t.date<TODAY;return `<div class="bitem ${dn?'done':''}" data-tid="${t.id}">
+        ${chkBtn(t,dn)}<span class="bt"><span>${esc(t.ti)}</span></span><span class="when ${late?'late':''}" data-open="${t.date}">${fmt(t.date)}</span></div>`}).join('')}
+    </section>`}).join('');
+  return `
+  <section class="phero stag" style="--i:0">
+    <div><div class="eyebrow" style="color:#AEB4DA">ඔක් 12 → නොවැ 30</div>
+      <h2>නොවැම්බර් 30 වෙද්දි <em>පරණ වැඩ ඉවරයි</em>, අලුත් වැඩ නතර වෙන්නේ නෑ.</h2></div>
+    <div class="stats">
+      <div class="stat"><b data-num="time">0</b><span>නොවැ 30ට දින</span><div class="sbar"><i data-bar="time" style="width:0"></i></div></div>
+      <div class="stat"><b data-pct="all">0%</b><span>මුළු plan එක (<span data-frac="all"></span>)</span><div class="sbar"><i data-bar="all" style="width:0"></i></div></div>
+      <div class="stat"><b data-pct="bl">0%</b><span>පරණ වැඩ ඉවරයි</span><div class="sbar"><i data-bar="bl" style="width:0"></i></div></div>
+      <div class="stat"><b data-num="mcqleft">0</b><span>පරණ MCQ ප්‍රශ්න ඉතුරුයි</span><div class="sbar"><i data-bar="mcqleft" style="width:0"></i></div></div>
+    </div>
+  </section>
+  <div class="dls">${dls}</div>
+  ${missed.length?`<details class="missed stag" style="--i:2"><summary><span class="n">${missed.length}</span><span>මඟ ඇරුණු වැඩ<small>ඉරිදා 7:30 review එකේ හරි, ඊළඟ ඒ subject දවසේ හරි කරන්න.</small></span><span class="chev">${IC.down.replace('<svg','<svg width="18" height="18"')}</span></summary>
+    <div class="tl">${missed.slice().reverse().map((t,i)=>taskCard(t,i,{showDate:true})).join('')}</div></details>`:''}
+  <h2 class="sec">Subject අනුව පරණ වැඩ</h2>
+  <p class="note" style="margin-top:-6px">රතු පාටින් තියෙන දිනය කියන්නේ ඒ වැඩේ මඟ ඇරිලා කියන එක.</p>
+  <div class="bgrid">${cards}</div>`;
+}
+function skinsHTML(){const eff=effSkin();return `<span class="pill" style="--n:${SKINS.findIndex(s=>s[0]===eff)}"></span>`+SKINS.map(([k,l,ic])=>`<button data-skin="${k}" aria-pressed="${eff===k}">${IC[ic]}<span>${l}</span></button>`).join('')}
+function viewRules(){
+  const ws='2026-10-26';const hrs={};for(let i=0;i<7;i++)PLAN[isoAdd(ws,i)].tasks.forEach(t=>{if(t.k==='rest')return;hrs[t.s]=(hrs[t.s]||0)+t.h});
+  const max=Math.max(...Object.values(hrs));
+  const hrows=['sft','et','ict','dip','asg','hex','rev'].filter(k=>hrs[k]).map(k=>`<div class="hrow" style="--c:${SUBJ[k].c};--c2:${SUBJ[k].c2}"><span>${SUBJ[k].n}</span><span class="gbar"><i style="width:${hrs[k]/max*100}%"></i></span><span class="hv">${Math.round(hrs[k]*4)/4}h</span></div>`).join('');
+  const frame=[1,2,3,4,5,6,0].map(w=>{const P=PLAN[isoAdd(ws,(w+6)%7)];return `<tr><th>${DAYS[w]}</th><td>${P.tasks.filter(t=>t.k!=='rest').map(t=>`<span style="--c:${SUBJ[t.s].c}"><b>${t.t}</b>${SUBJ[t.s].n}</span>`).join('')}</td></tr>`}).join('');
+  return `
+  <div class="cols">
+    <section class="card stag" style="--i:0"><h3>මේ plan එක වැඩ කරන්නේ මෙහෙමයි</h3><ol>
+      <li><b>දවසට එක subject එකයි.</b><span>සඳු සහ සිකු SFT, අඟහරුවාදා සහ බ්‍රහස්පතින්දා ICT, බදාදා ET. සෙනසුරාදා පන්ති දවස. ඉරිදා Diploma, assignments, Hexora.</span></li>
+      <li><b>පළමු block එක පරණ වැඩ, දෙවැන්න දැන් යන වැඩ.</b><span>පරණ වැඩ ඉවර වෙනකන් හැම subject දවසකම මුල් පැය 2 පරණ වැඩ වලට.</span></li>
+      <li><b>පන්තියේ දේ එදාම.</b><span>සෙනසුරාදා හවස ET/SFT notes, අඟහරුවාදා රෑ ICT class paper සහ notes. මේක කළොත් අලුත් backlog එකක් හැදෙන්නේ නෑ.</span></li>
+      <li><b>රෑ 10 ICT paper එක කවදාවත් මඟ අරින්න එපා.</b><span>විනාඩි 30යි. ඒ ප්‍රශ්නයි විවරණයයි තමා ICT apps වල content එක.</span></li>
+      <li><b>වැඩක් මඟ ඇරුණොත්.</b><span>ඉරිදා 7:30 review එකේ කරන්න. එකම subject එකේ මඟ ඇරුණු වැඩ 2කට වඩා එකතු වුණොත්, ඊළඟ ඒ subject දවසේ "දැන් යන" block එකෙන් බාගයක් පරණ වැඩට දෙන්න.</span></li>
+    </ol></section>
+    <section class="card stag" style="--i:1"><h3>පරණ වැඩ නැතුව අලුත් එක කරන්න බැරි තැන්</h3><div class="dep">
+      <div><span>SFT Unit 04 notes</span><i>→</i><span>Unit 04 flash cards</span><small>Notes ඔක් 16 ඉවරයි. Cards ඔක් 23 හදලා 24 ගෙනියනවා.</small></div>
+      <div><span>ICT Unit 03 notes</span><i>→</i><span>Unit 03 ගණන්</span><small>Notes ඔක් 13 සහ 20. ගණන් ඔක් 22 සිට.</small></div>
+      <div><span>ICT Unit 03 notes + ගණන්</span><i>→</i><span>Past paper book U03/U04</span><small>ඔක් 29 සිට නොවැ 10 වෙනකන්.</small></div>
+      <div><span>ET 6.1–6.3</span><i>→</i><span>6.4 සිට</span><small>ඒ කොටස් දැනටමත් පාඩම් කරලා තියෙන නිසා පන්තිය නතර කරන්න ඕන නෑ. ගණන් ඔක් 28.</small></div>
+      <div><span>Diploma slides</span><i>→</i><span>Recordings</span><small>Slides වලින් skeleton එක මුලින්. Recording එකේ බලන්නේ හිස් තැන් විතරයි.</small></div>
+    </div></section>
+    <section class="card stag" style="--i:2"><h3>ඉක්මනට ඉවර කරන ක්‍රම</h3><ul>
+      <li><b>Notes ලියද්දි</b><span>පන්තියේ notes හරි යාළුවෙක්ගේ පොත හරි පැත්තකින් තියාගෙන, මුලින් content එක. Diagrams සහ පාට පස්සේ.</span></li>
+      <li><b>Full papers ආයේ කරද්දි</b><span>වැරදුණු ප්‍රශ්න විතරක්. හරි ගිය ඒවා ආයේ කරන්න එපා.</span></li>
+      <li><b>MCQ backlog</b><span>ප්‍රශ්නයට විනාඩි 1යි. විවරණය වැරදුණු ඒවට සහ අනුමාන කරපු ඒවට විතරක්. ඒ විවරණයම apps වලට copy කරන්න.</span></li>
+      <li><b>Recordings ~80</b><span>ඔක්කොම බලන්න පැය 240ක් යනවා. ඒ නිසා slides මුලින් බලලා, 1.75–2x speed එකෙන් අවශ්‍ය කොටස් විතරක් බලන්න. Group එකේ අය එක්ක පාඩම් බෙදාගත්තොත් තවත් ලේසියි.</span></li>
+      <li><b>Flash cards</b><span>Card 30–40ක්. ඉස්සරහ ප්‍රශ්නය, පිටිපස්සේ උත්තරය. ඒ ප්‍රශ්නම quiz apps වලට.</span></li>
+      <li><b>Short notes</b><span>පිටු 2–3ක් විතරයි: සූත්‍ර, definitions, ඒකක, වැරදුණු තැන්.</span></li>
+    </ul></section>
+    <section class="card stag" style="--i:3"><h3>සාමාන්‍ය සතියක පැය</h3><div class="hours">${hrows}</div>
+      <p class="note" style="margin-top:12px">පන්ති වෙලාවලුත් එක්ක. සඳු–බ්‍රහ වැඩ පටන් ගන්නේ ප.ව. 3:30ට, නිදාගන්නේ 11ට (සිකු/සෙන 11:30).</p></section>
+  </div>
+  <h2 class="sec">සතියේ රාමුව</h2>
+  <div class="card frame stag" style="--i:4"><table><tbody>${frame}</tbody></table></div>
+  <h2 class="sec">පෙනුම</h2>
+  <div class="card skincard stag" style="--i:5"><div class="skins" data-skins>${skinsHTML()}</div>
+    <p class="note" style="margin:10px 0 0">Black කියන්නේ AMOLED phone screen වලට ගැළපෙන කළුම කළු පෙනුම.</p></div>
+  <h2 class="sec">මම හිතපු දේවල්</h2>
+  <div class="card stag" style="--i:6"><ul>
+    <li><b>සතියේ දවස් වල වැඩ ප.ව. 3:30ට පටන් ගන්නවා.</b><span>පාසල් වෙලාව වෙනස් නම්, blocks ටික එකම පිළිවෙළට පස්සට තල්ලු කරන්න.</span></li>
+    <li><b>කඩේ PC එකට යන්නේ ඉරිදා උදේ.</b><span>තව දවසක් යන්න පුළුවන් නම් magazine වැඩ ඒ දවසට දාලා ඉරිදාට වෙන assignments කරන්න.</span></li>
+    <li><b>Diploma "පාඩම 1" කියන්නේ assignment එකට අදාළ පාඩම.</b><span>Photoshop / Illustrator පාඩම මුලින්ම, ඊට පස්සේ අනිත් ඒවා.</span></li>
+    <li><b>Hexora පිටු team එක හදනවා.</b><span>උඹ කරන්නේ admin panel, quote calculator සහ review විතරයි.</span></li>
+  </ul></div>`;
+}
+
+/* ---------- skin ---------- */
+function effSkin(){if(ui.skin!=='auto')return ui.skin;const t=document.documentElement.getAttribute('data-theme');
+  if(t==='dark')return 'dark';if(t==='light')return 'light';try{return matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light'}catch(e){return 'light'}}
+function applySkin(){const r=document.documentElement;if(ui.skin==='auto')r.removeAttribute('data-skin');else r.setAttribute('data-skin',ui.skin);
+  const eff=effSkin(),n=SKINS.findIndex(s=>s[0]===eff);
+  document.getElementById('neo').setAttribute('aria-checked',eff!=='light');
+  document.querySelectorAll('[data-skins]').forEach(box=>{const p=box.querySelector('.pill');if(p)p.style.setProperty('--n',n);
+    box.querySelectorAll('button').forEach(b=>b.setAttribute('aria-pressed',b.dataset.skin===eff))});}
+
+/* ---------- shell ---------- */
+const SUBTXT={today:'තෝරපු දවසේ වැඩ ටික විතරයි',week:'සතියේ හැම දවසම එක තැනක',progress:'පරණ වැඩ, deadlines සහ ප්‍රගතිය',rules:'Plan එකේ නීති, ක්‍රම සහ පෙනුම'};
+function buildShell(){
+  document.getElementById('snav').insertAdjacentHTML('beforeend',TABS.map(([k,l])=>`<button data-tab="${k}">${IC[k].replace('<svg','<svg class="ic"')}<span class="fade">${l}</span></button>`).join(''));
+  document.getElementById('bnav').insertAdjacentHTML('beforeend',TABS.map(([k,l])=>`<button data-tab="${k}"><span class="bi">${IC[k]}</span><span>${l}</span></button>`).join(''));
+  document.querySelector('.side [data-skins]').insertAdjacentHTML('beforeend',SKINS.map(([k,l,ic])=>`<button data-skin="${k}" aria-pressed="false">${IC[ic]}<span>${l}</span></button>`).join(''));
+  document.getElementById('app').dataset.collapsed=ui.collapsed;
+  document.getElementById('dleft').textContent=Math.max(0,diff(TODAY,END));
+}
+function setTabUI(){const n=TABS.findIndex(t=>t[0]===ui.tab);
+  document.getElementById('sind').style.setProperty('--n',n);
+  document.querySelector('.bump').style.setProperty('--n',n);
+  document.querySelectorAll('[data-tab]').forEach(b=>b.setAttribute('aria-current',b.dataset.tab===ui.tab));
+  document.getElementById('ttl').textContent=TABS[n][1];
+  document.getElementById('tsub').textContent=SUBTXT[ui.tab];}
+function render(keepAnim,dir){
+  setTabUI();
+  const v=document.getElementById('view');
+  v.innerHTML=ui.tab==='today'?viewToday():ui.tab==='week'?viewWeek():ui.tab==='progress'?viewProgress():viewRules();
+  if(!keepAnim){v.classList.remove('in-r','in-l');v.style.animation='none';void v.offsetWidth;v.style.animation='';if(dir)v.classList.add(dir>0?'in-r':'in-l');}
+  else v.querySelectorAll('.stag').forEach(e=>e.style.animation='none');
+  applySkin();
+  requestAnimationFrame(()=>requestAnimationFrame(refresh));
+}
+const tabIdx=k=>TABS.findIndex(t=>t[0]===k);
+function go(tab){if(tab===ui.tab)return;const dir=Math.sign(tabIdx(tab)-tabIdx(ui.tab));ui.tab=tab;saveUi();render(false,dir);
+  const tt=document.getElementById('ttl');tt.classList.remove('swap');void tt.offsetWidth;tt.classList.add('swap');
+  const bi=document.querySelector('.bnav [data-tab="'+tab+'"] .bi');if(bi){bi.classList.remove('bounce');void bi.offsetWidth;bi.classList.add('bounce')}
+  window.scrollTo({top:0,behavior:'smooth'})}
+function goDay(d){d=clampDay(d);
+  if(ui.tab!=='today'){ui.sel=d;ui.tab='today';saveUi();render(false,-1);window.scrollTo({top:0,behavior:'smooth'});
+    const bi=document.querySelector('.bnav [data-tab="today"] .bi');if(bi){bi.classList.remove('bounce');void bi.offsetWidth;bi.classList.add('bounce')}return}
+  if(d===ui.sel)return;const dir=d>ui.sel?1:-1,same=weekStart(d)===weekStart(ui.sel);ui.sel=d;
+  const strip=document.querySelector('.strip');
+  if(same&&strip){const S=SUBJ[dayKey(d)[1]];strip.style.setProperty('--n',(dow(d)+6)%7);strip.style.setProperty('--c',S.c);strip.style.setProperty('--c2',S.c2);
+    strip.querySelectorAll('.sd').forEach(b=>b.setAttribute('aria-current',b.dataset.day===d))}
+  else if(strip){strip.outerHTML=stripHTML(d,dir>0?'in-r':'in-l')}
+  const body=document.getElementById('dayBody');body.innerHTML=dayBodyHTML(d);body.classList.remove('in-r','in-l');void body.offsetWidth;body.classList.add(dir>0?'in-r':'in-l');
+  requestAnimationFrame(()=>requestAnimationFrame(refresh));}
+function goWeek(n){const ws=isoAdd(ui.wk||weekStart(clampDay(TODAY)),n);if(ws<weekStart(START)||ws>weekStart(END))return;ui.wk=ws;render(false,Math.sign(n))}
+
+document.addEventListener('click',e=>{
+  const c=e.target.closest('.chk[data-id]');if(c){toggle(c.dataset.id,c);return}
+  const tb=e.target.closest('[data-tab]');if(tb){go(tb.dataset.tab);return}
+  const sk=e.target.closest('[data-skin]');if(sk){ui.skin=sk.dataset.skin;saveUi();applySkin();return}
+  const d=e.target.closest('[data-day]');if(d&&!d.disabled){goDay(d.dataset.day);return}
+  const o=e.target.closest('[data-open]');if(o){goDay(o.dataset.open);return}
+  const n=e.target.closest('[data-nav]');if(n&&!n.disabled){goDay(isoAdd(ui.sel,+n.dataset.nav));return}
+  const w=e.target.closest('[data-wk]');if(w&&!w.disabled){goWeek(+w.dataset.wk);return}
+  const g=e.target.closest('[data-goto]');if(g){if(g.dataset.goto==='today')goDay(clampDay(TODAY));else{const cur=ui.wk||weekStart(clampDay(TODAY)),tw=weekStart(clampDay(TODAY));ui.wk=null;render(false,Math.sign(diff(cur,tw)))}return}
+});
+document.getElementById('collapse').addEventListener('click',()=>{ui.collapsed=!ui.collapsed;document.getElementById('app').dataset.collapsed=ui.collapsed;saveUi()});
+document.getElementById('neo').addEventListener('click',()=>{ui.skin=effSkin()==='light'?'dark':'light';saveUi();applySkin()});
+try{matchMedia('(prefers-color-scheme: dark)').addEventListener('change',applySkin)}catch(e){}
+try{new MutationObserver(applySkin).observe(document.documentElement,{attributes:true,attributeFilter:['data-theme']})}catch(e){}
+setInterval(()=>{if(ui.tab==='today'&&ui.sel===TODAY)render(true)},5*60*1000);
+
+/* ripple */
+document.addEventListener('pointerdown',e=>{const el=e.target.closest('.sd,.nb,.snav button,.dl,.open,.skins button,.collapse');if(!el||el.disabled)return;
+  const r=el.getBoundingClientRect(),s=Math.max(r.width,r.height)*2.2,sp=document.createElement('span');sp.className='rip';
+  sp.style.cssText='width:'+s+'px;height:'+s+'px;left:'+(e.clientX-r.left-s/2)+'px;top:'+(e.clientY-r.top-s/2)+'px';el.appendChild(sp);setTimeout(()=>sp.remove(),650)},{passive:true});
+/* swipe */
+let sx=0,sy=0,st=0,sOk=false;
+const viewEl=document.getElementById('view');
+viewEl.addEventListener('touchstart',e=>{if(e.touches.length!==1){sOk=false;return}const t=e.touches[0];sx=t.clientX;sy=t.clientY;st=Date.now();sOk=!e.target.closest('.dls,.frame,.skins')},{passive:true});
+viewEl.addEventListener('touchend',e=>{if(!sOk)return;const t=e.changedTouches[0],dx=t.clientX-sx,dy=t.clientY-sy;
+  if(Math.abs(dx)<60||Math.abs(dx)<Math.abs(dy)*1.6||Date.now()-st>700)return;
+  if(ui.tab==='today')goDay(isoAdd(ui.sel,dx<0?1:-1));else if(ui.tab==='week')goWeek(dx<0?7:-7);},{passive:true});
+
+buildShell();render();initDb();
+/* splash: replay the page entrance once it lifts */
+(function(){const sp=document.getElementById('splash');if(!sp)return;let done=false;
+  const finish=()=>{if(done)return;done=true;const v=document.getElementById('view');v.style.animation='none';void v.offsetWidth;v.style.animation='';
+    v.querySelectorAll('.stag').forEach(e=>{e.style.animation='none';void e.offsetWidth;e.style.animation=''});
+    requestAnimationFrame(()=>requestAnimationFrame(refresh));setTimeout(()=>sp.remove(),800)};
+  if(getComputedStyle(sp).display==='none'){sp.remove();return}
+  sp.addEventListener('click',()=>{sp.classList.add('skip');setTimeout(finish,250)});
+  setTimeout(finish,2350);})();
+/* fonts load after the first paint so the page shows instantly */
+requestAnimationFrame(()=>{try{const l=document.createElement('link');l.rel='stylesheet';
+  l.href='https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,700;12..96,800&family=Noto+Sans+Sinhala:wght@400;600;700&display=swap';document.head.appendChild(l)}catch(e){}});
+
+/* ---------- PWA ---------- */
+if('serviceWorker' in navigator){addEventListener('load',()=>{navigator.serviceWorker.register('sw.js').catch(()=>{})})}
+let deferred=null;const ib=document.getElementById('install');
+const standalone=matchMedia('(display-mode: standalone)').matches||navigator.standalone===true;
+addEventListener('beforeinstallprompt',e=>{e.preventDefault();deferred=e;if(!standalone)ib.hidden=false});
+ib.addEventListener('click',async()=>{if(!deferred)return;deferred.prompt();try{await deferred.userChoice}catch(e){}deferred=null;ib.hidden=true});
+addEventListener('appinstalled',()=>{ib.hidden=true});
+(function(){const ios=/iphone|ipad|ipod/i.test(navigator.userAgent);let seen=false;try{seen=localStorage.getItem('nima-ios-hint')==='1'}catch(e){}
+  if(ios&&!standalone&&!seen){setTimeout(()=>{const d=document.createElement('div');d.className='ioshint';
+    d.innerHTML='<div><b>Phone එකට install කරන්න</b>Safari එකේ Share button එක ඔබලා "Add to Home Screen" තෝරන්න.</div><button aria-label="වහන්න">×</button>';
+    d.querySelector('button').onclick=()=>{d.remove();try{localStorage.setItem('nima-ios-hint','1')}catch(e){}};document.body.appendChild(d)},3200)}})();
+})();
+</script>
+</body>
+</html>
