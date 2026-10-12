@@ -1,5 +1,5 @@
 /* Nima Schedule service worker: app works offline, updates in the background */
-const VERSION = 'nima-v2';
+const VERSION = 'nima-v3';
 const SHELL = ['./', './index.html', './manifest.webmanifest', './icons/icon.svg', './icons/icon-192.png', './icons/icon-512.png', './icons/maskable-512.png', './icons/apple-touch-icon.png', './icons/favicon-32.png'];
 
 self.addEventListener('install', e => {
@@ -25,4 +25,27 @@ self.addEventListener('fetch', e => {
       return hit || net;
     }));
   }
+});
+
+/* push alerts: 10 minutes before each task */
+self.addEventListener('push', e => {
+  let d = {};
+  try { d = e.data ? e.data.json() : {}; } catch (err) { d = { title: 'Nima Schedule', body: e.data ? e.data.text() : '' }; }
+  e.waitUntil(self.registration.showNotification(d.title || 'Nima Schedule', {
+    body: d.body || '',
+    tag: d.tag || 'nima',
+    renotify: true,
+    icon: 'icons/icon-192.png',
+    badge: 'icons/favicon-32.png',
+    vibrate: [180, 80, 180],
+    data: { url: d.url || './' },
+  }));
+});
+self.addEventListener('notificationclick', e => {
+  e.notification.close();
+  const url = new URL((e.notification.data && e.notification.data.url) || './', self.registration.scope).href;
+  e.waitUntil(self.clients.matchAll({ type: 'window', includeUncontrolled: true }).then(list => {
+    for (const c of list) { if (c.url.startsWith(self.registration.scope)) { c.focus(); return; } }
+    return self.clients.openWindow(url);
+  }));
 });

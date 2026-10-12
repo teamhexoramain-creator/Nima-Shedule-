@@ -513,6 +513,21 @@ img{max-width:100%}
 .ioshint{position:fixed;left:12px;right:12px;bottom:calc(86px + env(safe-area-inset-bottom,0px));z-index:60;background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:14px 16px;box-shadow:var(--shadow);font-size:13.5px;display:flex;gap:12px;align-items:flex-start;animation:rise .5s var(--ease) both}
 .ioshint b{display:block;margin-bottom:2px}
 .ioshint button{margin-left:auto;font-size:18px;color:var(--muted);padding:0 4px}
+.bell{position:relative;width:40px;height:40px;border-radius:13px;display:grid;place-items:center;flex:0 0 auto;color:var(--muted);
+  background:var(--surface);border:1px solid var(--line);transition:transform .45s var(--spring),color .3s,background .3s,border-color .3s}
+.bell svg{width:20px;height:20px;transform-origin:50% 10%}
+.bell i{position:absolute;top:8px;right:9px;width:8px;height:8px;border-radius:50%;background:var(--muted);box-shadow:0 0 0 2px var(--surface);transition:background .3s}
+.bell.on{color:#fff;border-color:transparent;background:linear-gradient(135deg,var(--accent),var(--accent2));box-shadow:0 8px 18px -8px var(--accent)}
+.bell.on i{background:#FBBF24;box-shadow:0 0 0 2px color-mix(in srgb,var(--accent) 70%,#000)}
+.bell.ring svg{animation:ring 1s var(--ease)}
+.bell:active{transform:scale(.9)}
+@keyframes ring{0%,100%{transform:rotate(0)}15%{transform:rotate(18deg)}30%{transform:rotate(-15deg)}45%{transform:rotate(11deg)}60%{transform:rotate(-7deg)}75%{transform:rotate(3deg)}}
+.toast{position:fixed;left:50%;top:calc(14px + env(safe-area-inset-top,0px));z-index:120;transform:translate(-50%,-140%);max-width:min(92vw,440px);
+  background:var(--side);color:#fff;border-radius:16px;padding:12px 16px;font-size:13.5px;line-height:1.45;box-shadow:0 18px 40px -12px rgb(0 0 0 / .55);
+  display:flex;gap:10px;align-items:flex-start;transition:transform .55s var(--spring)}
+.toast.show{transform:translate(-50%,0)}
+.toast b{display:block}
+.toast span.ic{font-size:18px;line-height:1.2}
 </style>
 </head>
 <body>
@@ -564,6 +579,7 @@ img{max-width:100%}
 <circle class="lg-dot" cx="80" cy="16" r="6" fill="#FBBF24"/></svg></span>
       <div class="tt"><h1 id="ttl">අද</h1><p id="tsub"></p></div>
       <button class="inst" id="install" hidden aria-label="Phone එකට install කරන්න"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12M7 10l5 5 5-5M5 21h14"/></svg>Install</button>
+      <button class="bell" id="bell" hidden aria-label="Alerts"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9a6 6 0 1 1 12 0c0 6 2.5 7.5 2.5 7.5h-17S6 15 6 9z"/><path d="M10 20a2.2 2.2 0 0 0 4 0"/></svg><i></i></button>
       <button class="neo" id="neo" role="switch" aria-checked="false" aria-label="Dark mode">
         <span class="hole"></span>
         <span class="knob">
@@ -857,7 +873,7 @@ function countTo(el,v){const from=+(el.dataset.v||0);el.dataset.v=v;if(from===v)
   const t0=performance.now(),d=900;const step=t=>{const k=Math.min(1,(t-t0)/d),e=1-Math.pow(1-k,3);el.textContent=Math.round(from+(v-from)*e);if(k<1)requestAnimationFrame(step)};requestAnimationFrame(step)}
 
 function toggle(id,btn){
-  const on=!state.done[id];if(on)state.done[id]=1;else delete state.done[id];saveLocal();queueSave();
+  const on=!state.done[id];if(on)state.done[id]=1;else delete state.done[id];saveLocal();queueSave();if(typeof onDoneChange==='function')onDoneChange();
   document.querySelectorAll('[data-tid="'+id+'"]').forEach(el=>{el.classList.toggle('done',on);const b=el.querySelector('.chk');if(b)b.setAttribute('aria-pressed',on)});
   if(on&&btn){const host=btn.closest('[data-tid]');const bs=document.createElement('span');bs.innerHTML=BURST;const node=bs.firstChild;btn.appendChild(node);
     if(host){host.classList.remove('pop');void host.offsetWidth;host.classList.add('pop')}setTimeout(()=>{node.remove();host&&host.classList.remove('pop')},760)}
@@ -1115,6 +1131,41 @@ buildShell();render();initDb();
 /* fonts load after the first paint so the page shows instantly */
 requestAnimationFrame(()=>{try{const l=document.createElement('link');l.rel='stylesheet';
   l.href='https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,700;12..96,800&family=Noto+Sans+Sinhala:wght@400;600;700&display=swap';document.head.appendChild(l)}catch(e){}});
+
+/* ---------- 10-minute alerts (web push) ---------- */
+const VAPID_PUB='BC0kzxnRhF48Y64gBivDf_hNPb9Vi0P7QwQJGNhmZXQUWp_D3nWNg61pCvQ2cPNt-YouZsJeJ0gB93WfSYDMT7o';
+const bell=document.getElementById('bell');
+const pushOK=('serviceWorker' in navigator)&&('PushManager' in window)&&('Notification' in window);
+const isIOS=/iphone|ipad|ipod/i.test(navigator.userAgent);
+let alertsOn=false;try{alertsOn=localStorage.getItem('nima-push')==='1'}catch(e){}
+let toastT=null;
+function toast(title,msg,ic){let el=document.querySelector('.toast');if(!el){el=document.createElement('div');el.className='toast';el.setAttribute('role','status');document.body.appendChild(el)}
+  el.innerHTML='<span class="ic">'+(ic||'🔔')+'</span><div><b></b><span class="tx"></span></div>';el.querySelector('b').textContent=title;el.querySelector('.tx').textContent=msg;
+  requestAnimationFrame(()=>el.classList.add('show'));clearTimeout(toastT);toastT=setTimeout(()=>el.classList.remove('show'),4200)}
+function paintBell(){bell.classList.toggle('on',alertsOn);bell.setAttribute('aria-pressed',alertsOn);bell.setAttribute('aria-label',alertsOn?'Alerts on — off කරන්න':'Alerts on කරන්න')}
+const b64=s=>{const p='='.repeat((4-s.length%4)%4);const r=atob((s+p).replace(/-/g,'+').replace(/_/g,'/'));return Uint8Array.from([...r].map(c=>c.charCodeAt(0)))};
+async function api(method,body){const r=await fetch('/api/push',{method,headers:{'content-type':'application/json'},body:JSON.stringify(body)});let j={};try{j=await r.json()}catch(e){}if(!r.ok)throw new Error(j.error||('HTTP '+r.status));return j}
+async function enableAlerts(){
+  if(isIOS&&!standalone){toast('ඉස්සෙල්ලා install කරන්න','iPhone එකේ alerts එන්නේ app එක Home Screen එකට add කළාම විතරයි. Share → Add to Home Screen.','📲');return}
+  const perm=await Notification.requestPermission();
+  if(perm!=='granted'){toast('Notifications block වෙලා','Phone settings වල මේ app එකට notifications allow කරලා ආයේ bell එක ඔබන්න.','🔕');return}
+  try{const reg=await navigator.serviceWorker.ready;let sub=await reg.pushManager.getSubscription();
+    if(!sub)sub=await reg.pushManager.subscribe({userVisibleOnly:true,applicationServerKey:b64(VAPID_PUB)});
+    await api('POST',{subscription:sub.toJSON(),done:Object.keys(state.done),test:true});
+    alertsOn=true;try{localStorage.setItem('nima-push','1')}catch(e){}paintBell();bell.classList.remove('ring');void bell.offsetWidth;bell.classList.add('ring');
+    toast('Alerts on වුණා','හැම වැඩකටම විනාඩි 10කට කලින් notification එකක් එනවා. දැන් test alert එකක් ආවා.','✅');
+  }catch(err){toast('Alerts on කරන්න බැරි වුණා',String(err.message||err),'⚠️')}}
+async function disableAlerts(){try{const reg=await navigator.serviceWorker.ready;const sub=await reg.pushManager.getSubscription();
+  if(sub){try{await api('DELETE',{endpoint:sub.endpoint})}catch(e){}await sub.unsubscribe()}}catch(e){}
+  alertsOn=false;try{localStorage.removeItem('nima-push')}catch(e){}paintBell();toast('Alerts off','තවදුරටත් alerts එන්නේ නෑ. ආයේ ඕන නම් bell එක ඔබන්න.','🔕')}
+let syncT=null;
+function onDoneChange(){if(!alertsOn)return;clearTimeout(syncT);syncT=setTimeout(async()=>{try{const reg=await navigator.serviceWorker.ready;const sub=await reg.pushManager.getSubscription();
+  if(sub)await api('POST',{endpoint:sub.endpoint,done:Object.keys(state.done)})}catch(e){}},1500)}
+if(pushOK||isIOS){bell.hidden=false;paintBell();
+  bell.addEventListener('click',()=>{if(!pushOK&&isIOS){enableAlerts();return}alertsOn?disableAlerts():enableAlerts()});
+  if(alertsOn&&pushOK){navigator.serviceWorker.ready.then(reg=>reg.pushManager.getSubscription()).then(sub=>{
+    if(!sub||Notification.permission!=='granted'){alertsOn=false;try{localStorage.removeItem('nima-push')}catch(e){}paintBell();return}
+    api('POST',{subscription:sub.toJSON(),done:Object.keys(state.done)}).catch(()=>{})}).catch(()=>{})}}
 
 /* ---------- PWA ---------- */
 if('serviceWorker' in navigator){addEventListener('load',()=>{navigator.serviceWorker.register('sw.js').catch(()=>{})})}
