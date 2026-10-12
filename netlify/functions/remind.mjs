@@ -3,18 +3,15 @@
 import { getStore } from '@netlify/blobs';
 import webpush from 'web-push';
 import { dueTasks, payloadFor } from '../lib/reminders.mjs';
+import { getVapid, subject } from '../lib/vapid.mjs';
 
 export default async () => {
   const due = dueTasks(Date.now());
   if (!due.length) return;
 
-  webpush.setVapidDetails(
-    Netlify.env.get('VAPID_SUBJECT') || 'mailto:teamhexoramain@gmail.com',
-    Netlify.env.get('VAPID_PUBLIC_KEY'),
-    Netlify.env.get('VAPID_PRIVATE_KEY'),
-  );
-
   const store = getStore({ name: 'push', consistency: 'strong' });
+  const v = await getVapid(store);
+  webpush.setVapidDetails(subject(), v.publicKey, v.privateKey);
   const { blobs } = await store.list({ prefix: 'subs/' });
 
   for (const { key } of blobs) {

@@ -1133,7 +1133,7 @@ requestAnimationFrame(()=>{try{const l=document.createElement('link');l.rel='sty
   l.href='https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,700;12..96,800&family=Noto+Sans+Sinhala:wght@400;600;700&display=swap';document.head.appendChild(l)}catch(e){}});
 
 /* ---------- 10-minute alerts (web push) ---------- */
-const VAPID_PUB='BC0kzxnRhF48Y64gBivDf_hNPb9Vi0P7QwQJGNhmZXQUWp_D3nWNg61pCvQ2cPNt-YouZsJeJ0gB93WfSYDMT7o';
+let VAPID_PUB=null;
 const bell=document.getElementById('bell');
 const pushOK=('serviceWorker' in navigator)&&('PushManager' in window)&&('Notification' in window);
 const isIOS=/iphone|ipad|ipod/i.test(navigator.userAgent);
@@ -1149,9 +1149,15 @@ async function enableAlerts(){
   if(isIOS&&!standalone){toast('ඉස්සෙල්ලා install කරන්න','iPhone එකේ alerts එන්නේ app එක Home Screen එකට add කළාම විතරයි. Share → Add to Home Screen.','📲');return}
   const perm=await Notification.requestPermission();
   if(perm!=='granted'){toast('Notifications block වෙලා','Phone settings වල මේ app එකට notifications allow කරලා ආයේ bell එක ඔබන්න.','🔕');return}
-  try{const reg=await navigator.serviceWorker.ready;let sub=await reg.pushManager.getSubscription();
-    if(!sub)sub=await reg.pushManager.subscribe({userVisibleOnly:true,applicationServerKey:b64(VAPID_PUB)});
-    await api('POST',{subscription:sub.toJSON(),done:Object.keys(state.done),test:true});
+  try{const reg=await navigator.serviceWorker.ready;
+    if(!VAPID_PUB){const r=await fetch('/api/push',{cache:'no-store'});const j=await r.json().catch(()=>({}));if(!r.ok||!j.publicKey)throw new Error(j.error||('Server key එක ගන්න බැරි වුණා (HTTP '+r.status+')'));VAPID_PUB=j.publicKey}
+    const want=b64(VAPID_PUB);const same=(a,b)=>a&&a.byteLength===b.byteLength&&new Uint8Array(a).every((x,i)=>x===b[i]);
+    const subscribe=()=>reg.pushManager.subscribe({userVisibleOnly:true,applicationServerKey:want});
+    let sub=await reg.pushManager.getSubscription();
+    if(sub&&!same(sub.options&&sub.options.applicationServerKey,want)){await sub.unsubscribe();sub=null}
+    if(!sub)sub=await subscribe();
+    try{await api('POST',{subscription:sub.toJSON(),done:Object.keys(state.done),test:true})}
+    catch(e){if(/key එක මාරු/.test(e.message)){await sub.unsubscribe();sub=await subscribe();await api('POST',{subscription:sub.toJSON(),done:Object.keys(state.done),test:true})}else throw e}
     alertsOn=true;try{localStorage.setItem('nima-push','1')}catch(e){}paintBell();bell.classList.remove('ring');void bell.offsetWidth;bell.classList.add('ring');
     toast('Alerts on වුණා','හැම වැඩකටම විනාඩි 10කට කලින් notification එකක් එනවා. දැන් test alert එකක් ආවා.','✅');
   }catch(err){toast('Alerts on කරන්න බැරි වුණා',String(err.message||err),'⚠️')}}
