@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>Nima Schedule</title>
-<meta name="description" content="ඔක් 12 සිට නොවැ 30 වෙනකන් A/L, Diploma සහ Hexora වැඩ balance කරන plan එක.">
+<meta name="description" content="ඔක් 19 සිට නොවැ 30 වෙනකන් A/L, Diploma සහ Hexora වැඩ balance කරන plan එක.">
 <meta name="theme-color" content="#0A0C1C">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
@@ -318,6 +318,7 @@ button,.sd,.nb{touch-action:manipulation;-webkit-tap-highlight-color:transparent
 .tk.fixed{background:color-mix(in srgb,var(--c) 7%,var(--surface));border-style:dashed}
 .tk.fixed .chk{visibility:hidden}
 .tk.fixed .glow{display:none}
+.tk.buf{background:repeating-linear-gradient(135deg,color-mix(in srgb,var(--c) 6%,var(--surface)) 0 10px,var(--surface) 10px 20px);border-width:2px}
 .rest{display:flex;align-items:center;gap:10px;color:var(--muted);font-size:12.5px;padding:2px 6px}
 .rest::before,.rest::after{content:"";flex:1;height:1px;background:repeating-linear-gradient(90deg,var(--line) 0 6px,transparent 6px 11px)}
 .rest svg{width:15px;height:15px}
@@ -836,7 +837,7 @@ img{max-width:100%}
 <path class="lg-chk" d="M37 55l7 7 15-15" fill="none" stroke="#fff" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
 <circle class="lg-dot" cx="80" cy="16" r="6" fill="#FBBF24"/></svg></div>
     <h1 class="sp-name"><span style="--i:0">N</span><span style="--i:1">i</span><span style="--i:2">m</span><span style="--i:3">a</span><span class="sp" style="--i:4"> </span><span class="g" style="--i:5">S</span><span class="g" style="--i:6">c</span><span class="g" style="--i:7">h</span><span class="g" style="--i:8">e</span><span class="g" style="--i:9">d</span><span class="g" style="--i:10">u</span><span class="g" style="--i:11">l</span><span class="g" style="--i:12">e</span></h1>
-    <p class="sp-tag">ඔක් 12 → නොවැ 30 · Balance plan</p>
+    <p class="sp-tag">ඔක් 19 → නොවැ 30 · Balance plan</p>
     <div class="sp-bar"><i></i></div>
   </div>
   <span class="sp-skip">Tap කරලා skip කරන්න</span>
@@ -850,7 +851,7 @@ img{max-width:100%}
 <rect class="lg-hi" x="4" y="4" width="88" height="44" rx="26" fill="#fff" opacity=".12"/>
 <path class="lg-cal" d="M26 34a6 6 0 0 1 6-6h32a6 6 0 0 1 6 6v30a6 6 0 0 1-6 6H32a6 6 0 0 1-6-6zM26 41h44M38 22v11M58 22v11" fill="none" stroke="#fff" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
 <path class="lg-chk" d="M37 55l7 7 15-15" fill="none" stroke="#fff" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
-<circle class="lg-dot" cx="80" cy="16" r="6" fill="#FBBF24"/></svg></span><span class="fade"><b>Nima Schedule</b><small>ඔක් 12 → නොවැ 30</small></span></div>
+<circle class="lg-dot" cx="80" cy="16" r="6" fill="#FBBF24"/></svg></span><span class="fade"><b>Nima Schedule</b><small>ඔක් 19 → නොවැ 30</small></span></div>
     <nav class="snav" id="snav"><span class="sind" id="sind"></span></nav>
     <div class="sfoot">
       <div class="daysleft"><b id="dleft">–</b><span class="fade">නොවැ 30ට දින</span></div>
@@ -891,208 +892,227 @@ img{max-width:100%}
 
 <script>
 (function(){
-const START='2026-10-12', END='2026-11-30';
+const START='2026-10-19', END='2026-11-30';
+/* PLAN_V: bump whenever the plan builder changes task order, so ticks / edits saved for the old plan
+   are not attached to different tasks of the new one (task ids are date-index). */
+const PLAN_V=4;
 const SUBJ={
   sft:{n:'SFT',c:'var(--sft)',full:'Science for Technology'},
   et:{n:'ET',c:'var(--et)',full:'Engineering Technology'},
   ict:{n:'ICT',c:'var(--ict)',full:'Information & Communication Technology'},
   dip:{n:'DIPLOMA',c:'var(--dip)',full:'Technology diploma'},
   hex:{n:'HEXORA',c:'var(--hex)',full:'Hexora site සහ apps'},
-  asg:{n:'කඩේ PC',c:'var(--asg)',full:'Diploma assignments (Mini Magazine ඇතුළුව)'},
+  asg:{n:'ASSIGNMENT',c:'var(--asg)',full:'Diploma assignments (Mini Magazine ඇතුළුව)'},
   rev:{n:'REVIEW',c:'var(--rev)',full:'Review'},
   mix:{n:'පන්ති',c:'var(--mix)',full:''}
 };
-const KIND={old:'පරණ වැඩ',now:'දැන් යන',cls:'පන්තිය',daily:'හැමදාම',rev:'Review',rest:''};
+const KIND={old:'පරණ වැඩ',now:'දැන් යන',cls:'පන්තිය',daily:'හැමදාම',rev:'Review',buf:'Buffer',rest:''};
 const DAYS=['ඉරිදා','සඳුදා','අඟහරුවාදා','බදාදා','බ්‍රහස්පතින්දා','සිකුරාදා','සෙනසුරාදා'];
 const DSH=['ඉරි','සඳු','අඟ','බදා','බ්‍රහ','සිකු','සෙන'];
-const MON={10:'ඔක්',11:'නොවැ'}; const MONF={10:'ඔක්තෝබර්',11:'නොවැම්බර්'};
-const DAYTYPE={1:['SFT දවස','sft'],2:['ICT දවස','ict'],3:['ET දවස','et'],4:['Campus දවස · Diploma','dip'],5:['Buffer · ICT backlog + Diploma පන්තිය','mix'],6:['පන්ති දවස · ET + SFT','mix'],0:['App development · Assignments','hex']};
+const MON={1:'ජන',2:'පෙබ',3:'මාර්',4:'අප්‍රේ',5:'මැයි',6:'ජූනි',7:'ජූලි',8:'අගෝ',9:'සැප්',10:'ඔක්',11:'නොවැ',12:'දෙසැ'};
+const MONF={1:'ජනවාරි',2:'පෙබරවාරි',3:'මාර්තු',4:'අප්‍රේල්',5:'මැයි',6:'ජූනි',7:'ජූලි',8:'අගෝස්තු',9:'සැප්තැම්බර්',10:'ඔක්තෝබර්',11:'නොවැම්බර්',12:'දෙසැම්බර්'};
+const DAYTYPE={1:['SFT දවස','sft'],2:['ICT දවස · පන්තිය','ict'],3:['ET දවස','et'],4:['Campus දවස · Diploma','dip'],5:['Buffer දවස · ICT + Diploma පන්තිය','mix'],6:['පන්ති දවස · ET + SFT','mix'],0:['App development · Assignments','hex']};
 
 const isoAdd=(iso,n)=>{const d=new Date(iso+'T00:00:00Z');d.setUTCDate(d.getUTCDate()+n);return d.toISOString().slice(0,10)};
 const dow=iso=>new Date(iso+'T00:00:00Z').getUTCDay();
 const diff=(a,b)=>Math.round((new Date(b+'T00:00:00Z')-new Date(a+'T00:00:00Z'))/864e5);
-const fmt=iso=>{const m=+iso.slice(5,7),d=+iso.slice(8,10);return MON[m]+' '+d};
-const fmtLong=iso=>{const m=+iso.slice(5,7),d=+iso.slice(8,10);return MONF[m]+' '+d};
+const yr=iso=>iso.slice(0,4)!=='2026'?' '+iso.slice(0,4):'';
+const fmt=iso=>{const m=+iso.slice(5,7),d=+iso.slice(8,10);return MON[m]+' '+d+yr(iso)};
+const fmtLong=iso=>{const m=+iso.slice(5,7),d=+iso.slice(8,10);return MONF[m]+' '+d+yr(iso)};
 const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
-function mins(t,ap){let[h,m]=t.split(':').map(Number);if(ap==='pm'&&h<12)h+=12;return h*60+m}
+/* 12-hour clock -> minutes after midnight ("12:30" am = 00:30, "12:30" pm = 12:30) */
+function mins(t,ap){let[h,m]=t.split(':').map(Number);if(ap==='pm'&&h<12)h+=12;if(ap==='am'&&h===12)h=0;return h*60+m}
 function todayISO(){try{return new Intl.DateTimeFormat('en-CA',{timeZone:'Asia/Colombo',year:'numeric',month:'2-digit',day:'2-digit'}).format(new Date())}catch(e){return new Date().toISOString().slice(0,10)}}
 
-/* ---------- queues (v3 week: SFT Mon · ICT Tue · ET Wed · Campus Thu · ICT backlog Fri · classes Sat · App dev Sun) ---------- */
-const SFT_Q=[ // one block each, in the order they are done (Fri Oct 16 = 2 blocks, then 3 per Monday)
- {ti:'Unit 04 notes පොතේ ලියන්න — 1 කොටස',d:'පන්තියේ ඉගැන්නුව කොටස ඔක්කොම පොතට. මුලින් content එක, diagrams සහ පාට පස්සේ.',bl:1},
- {ti:'Unit 04 notes ඉවර කරන්න',d:'Notes ඉවර නැතුව flash cards හදන්න බෑ. ඒ නිසා අද ඉවර කරන්නම ඕන.',bl:1},
- {ti:'Unit 04 flash cards හදන්න',d:'Deadline සෙනසුරාදා (ඔක් 24). Card 30–40ක්: ඉස්සරහ ප්‍රශ්නය/පදය, පිටිපස්සේ උත්තරය/සූත්‍රය. එක පාට theme එකක් තියාගෙන ලස්සනට.',bl:1},
- {ti:'Flash cards ඉවර කරලා Unit 04 පාඩම් කරන්න',d:'Cards වලින්ම තමන්ගෙන්ම ප්‍රශ්න අහලා පාඩම් කරන්න. ඒ ප්‍රශ්නම SFT quiz app එකටත් දාන්න.',bl:1},
- {ti:'Unit 02 + 04 full paper — වැරදුණු ප්‍රශ්න ආයේ කරන්න',d:'වැරදුණු ප්‍රශ්න විතරක්. Discuss කරපු උත්තර එක්ක check කරලා, වැරදුණේ ඇයි කියලා කෙටියෙන් ලියන්න.',bl:1},
- {ti:'Unit 04 tute සම්පූර්ණ කරන්න',d:'ඉතුරු ප්‍රශ්න ඔක්කොම. බැරි ඒවා ලකුණු කරලා සෙනසුරාදා පන්තියේ අහන්න.',bl:1},
- {ti:'Unit 02 tute ගණන් — 1 කොටස',d:'බාගයක් විතර. හැම ගණනකම සූත්‍රය උඩින්ම ලියන්න.',bl:1},
- {ti:'Unit 01 / 03 tute (අලුත් වැඩ)',d:'මූලික ගණිතය සහ පයිතගරස් සම්බන්ධය tute එක, පන්තිය ගිය තැනට.',k:'now'},
- {ti:'Unit 02 tute ගණන් ඉවර කරලා පාඩම් කරන්න',d:'ඉතුරු ගණන් + පාඩමේ definitions/සූත්‍ර පාඩම් කරන්න.',bl:1},
- {ti:'Unit 02 short note',d:'පිටු 2–3ක් උපරිම: සූත්‍ර, definitions, ඒකක, කලින් වැරදුණු තැන්.',bl:1},
- {ti:'Unit 04 short note',d:'Notes සහ flash cards වලින් වැදගත්ම ටික විතරක්.',bl:1},
- {ti:'Unit 02 පාඩම් paper එක',d:'වෙලාව තියාගෙන කරන්න. වැරදුණු ඒවාට විවරණය ලියන්න.',bl:1},
- {ti:'Unit 04 පාඩම් paper එක',d:'වෙලාව තියාගෙන කරන්න. වැරදුණු ඒවාට විවරණය ලියන්න.',bl:1},
- {ti:'Unit 01 short note + paper',d:'පාඩම ඉවර නම්. නැත්නම් මේ කාලය tute එකට දෙන්න.',k:'now'},
- {ti:'Unit 03 short note',k:'now'},
- {ti:'Unit 03 paper + විවරණය',k:'now'},
- {ti:'Units 02 + 04 වැරදුණු ප්‍රශ්න revision',d:'Papers වල වැරදුණු ප්‍රශ්න ආයේ කරලා බලන්න.',k:'now'},
- {ti:'Units 01–04 mixed paper (වෙලාව එක්ක)',k:'now'},
- {ti:'Mixed paper එකේ වැරදි විවරණය + දුර්වල කොටස්',k:'now'},
- {ti:'Unit 01 / 03 tute (අලුත් වැඩ) — 2',d:'පන්තිය ගිය තැනට.',k:'now'},
- {ti:'අලුත් පාඩම: notes + tute',k:'now'},
- {ti:'අලුත් පාඩම: notes + tute — 2',k:'now'},
- {ti:'Balance check — SFT',d:'"ප්‍රගතිය" tab එකේ SFT ලැයිස්තුව බලලා ඉතුරු දේවල් තියෙනවා නම් ලියාගන්න.',k:'rev'}
+/* =====================================================================
+   PLAN v4 · ඔක් 19 → නොවැ 30
+   Wake 8:30 · sleep 1:00. Work 9:30 am – 11 pm in 3-hour blocks.
+   Mon SFT · Tue ICT (+class) · Wed ET · Thu Campus · Fri ICT + buffer + Diploma class ·
+   Sat ET/SFT classes + notes + Diploma class · Sun assignments + app development
+   Subject day: block 1 (9:30–12:30) පරණ වැඩ · block 2 (2–5) දැන් යන වැඩ · block 3 (7–9) papers / short notes
+   ===================================================================== */
+const O=(ti,d)=>({ti,d,bl:1});            // backlog (පරණ වැඩ)
+const N=(ti,d)=>({ti,d,k:'now'});          // current work (දැන් යන)
+const R=(ti,d,s)=>Object.assign({ti,d,k:'rev'},s?{s}:{});   // check / review
+const SFT_DAYS=[ // 7 Mondays: [block 1, block 2, block 3]
+ [O('Unit 04 notes පොතේ සම්පූර්ණ කරන්න','පන්තියේ ඉගැන්නුව ඔක්කොම. මුලින් content එක, diagrams සහ පාට පස්සේ. Notes ඉවර නැතුව flash cards හදන්න බෑ, ඒ නිසා මේක මුලින්ම.'),
+  O('Unit 04 flash cards හදන්න (card 30–40)','Deadline සෙනසුරාදා (ඔක් 24). ඉස්සරහ ප්‍රශ්නය / පදය, පිටිපස්සේ උත්තරය / සූත්‍රය. එක පාට theme එකක් තියාගෙන අද card ඔක්කොම ලියන්න.'),
+  O('Flash cards ඉවර කරලා Unit 04 පාඩම් කරන්න','Cards වලින් තමන්ගෙන්ම ප්‍රශ්න අහන්න. Cards ඉතුරු නම් සිකුරාදා buffer එකේ ඉවර කරන්න, සෙනසුරාදා ගෙනියන්න ඕන. ප්‍රශ්න ටික SFT quiz app එකටත්.')],
+ [O('Unit 04 tute සම්පූර්ණ කරන්න','ඉතුරු ප්‍රශ්න ඔක්කොම. බැරි ඒවා ලකුණු කරලා Tools → "ගුරුවරයාගෙන් අහන්න" එකට දාන්න.'),
+  N('Unit 01 / 03 tute (පන්තිය ගිය තැනට)','මූලික ගණිතය සහ පයිතගරස් සම්බන්ධය. සෙනසුරාදා ලියපු notes එක්ක කරන්න.'),
+  O('Unit 02 + 04 full paper: වැරදුණු ප්‍රශ්න ආයේ කරන්න','වැරදුණු ප්‍රශ්න විතරක්. Discuss කරපු උත්තර එක්ක check කරලා, වැරදුණේ ඇයි කියලා කෙටියෙන් ලියන්න.')],
+ [O('Unit 02 tute ගණන් ඔක්කොම','හැම ගණනකම සූත්‍රය උඩින්ම ලියන්න. බැරි ඒවා ලකුණු කරලා පන්තියේ අහන්න.'),
+  N('Unit 01 short note + paper','පිටු 2–3: සූත්‍ර, definitions, ඒකක. ඊට පස්සේ වෙලාව තියාගෙන paper එක.'),
+  O('Unit 02 short note + definitions පාඩම් කරන්න','පිටු 2–3 උපරිම: සූත්‍ර, definitions, ඒකක, කලින් වැරදුණු තැන්.')],
+ [O('Unit 02 පාඩම් paper එක (වෙලාව එක්ක) + විවරණය','වැරදුණු ඒවාට විවරණය ලියන්න. ලකුණු Tools → MCQ ලකුණු එකට දාන්න.'),
+  N('Unit 03 tute ඉතුරු ටික + short note'),
+  O('Unit 04 short note','Notes සහ flash cards වලින් වැදගත්ම ටික විතරක්.')],
+ [O('Unit 04 පාඩම් paper එක (වෙලාව එක්ක) + විවරණය','වැරදුණු ඒවාට විවරණය ලියන්න. ලකුණු Tools → MCQ ලකුණු එකට දාන්න.'),
+  N('Unit 03 paper + විවරණය'),
+  O('Units 02 + 04: papers වල වැරදුණු ප්‍රශ්න revision','කලින් papers වල වැරදුණු ප්‍රශ්න ආයේ කරලා බලන්න.')],
+ [O('Units 01–04 mixed paper (වෙලාව එක්ක)'),
+  N('අලුත් පාඩම: notes + tute (පන්තිය ගිය තැනට)'),
+  O('Mixed paper එකේ වැරදි විවරණය + දුර්වල කොටස්')],
+ [O('SFT ඉතුරු පරණ වැඩ (ප්‍රගතිය tab එක බලලා)','ප්‍රගතිය tab එකේ SFT ලැයිස්තුවේ ඉතුරු ඒවා. ඔක්කොම ඉවර නම් flash cards revision.'),
+  N('අලුත් පාඩම: notes + tute (පන්තිය ගිය තැනට) · 2'),
+  R('අවසාන balance check: subjects ඔක්කොම','ප්‍රගතිය tab එකේ හැම subject එකක්ම බලලා ඉතුරු දේවල් ලියාගන්න. දෙසැම්බර් plan එකට ඒ ටික.','rev')]
 ];
-const ET_Q=[
- [{ti:'ET full paper ආයේ කරන්න',d:'මේ දක්වා උගන්නපු පාඩම් වලින් දීපු paper එක. වෙලාව තියාගෙන.',bl:1},
-  {ti:'Full paper එකේ වැරදි විවරණය කරගන්න',d:'වැරදුණු හැම ප්‍රශ්නයකටම නිවැරදි ක්‍රමය + වැරදුණේ ඇයි. වැඩිපුර වැරදුණු පාඩම් ලකුණු කරගන්න.',bl:1}],
- [{ti:'Unit 05 ගණන් පුරුදු වෙන්න',d:'Tute + paper ගණන්. සූත්‍ර ලැයිස්තුවක් පැත්තකින් තියාගන්න.',bl:1},
-  {ti:'Unit 06 notes + tute (දැන් යන කොටස)',d:'6.4 සිට පන්තිය ගිය තැනට notes සම්පූර්ණ කරලා tute එක.',k:'now'}],
- [{ti:'Unit 06 (6.1–6.3) ගණන් පුරුදු වෙන්න',bl:1},
-  {ti:'Unit 01 flash cards + revision',d:'Cards හදන ගමන්ම පාඩම revise වෙනවා. ප්‍රශ්න ටික ET quiz app එකටත්.',bl:1}],
- [{ti:'Unit 03 flash cards + revision',bl:1},{ti:'Unit 01 short note + paper',bl:1}],
- [{ti:'Unit 05 flash cards + revision',bl:1},{ti:'Unit 03 short note + paper',bl:1}],
- [{ti:'Unit 06 flash cards + revision',bl:1},{ti:'Unit 05 short note + paper',bl:1}],
- [{ti:'Unit 06 short note + paper',bl:1},{ti:'Units 01–06 mixed paper + දුර්වල කොටස්',k:'now'}]
+const ET_DAYS=[ // 6 Wednesdays
+ [O('ET full paper ආයේ කරන්න (වෙලාව එක්ක)','මේ දක්වා උගන්නපු පාඩම් වලින් දීපු paper එක. ඉවර වෙලා වැරදුණු ඒවා ලකුණු කරන්න.'),
+  N('Unit 06 (6.4 සිට) notes + tute, පන්තිය ගිය තැනට','6.1–6.3 දැනටමත් පාඩම් කරලා තියෙන නිසා කෙලින්ම 6.4න් පටන් ගන්න.'),
+  O('Full paper එකේ වැරදි විවරණය කරගන්න','හැම වැරදුණු ප්‍රශ්නයකටම නිවැරදි ක්‍රමය + වැරදුණේ ඇයි. වැඩිපුර වැරදුණු පාඩම් ලකුණු කරගන්න.')],
+ [O('Unit 05 ගණන් පුරුදු වෙන්න','Tute + paper ගණන්. සූත්‍ර ලැයිස්තුවක් පැත්තකින් තියාගන්න.'),
+  N('Unit 06 (6.4 සිට) ගණන් + tute'),
+  O('Unit 06 (6.1–6.3) ගණන් පුරුදු වෙන්න')],
+ [O('Unit 01 flash cards + revision','Cards හදන ගමන්ම පාඩම revise වෙනවා. ප්‍රශ්න ටික ET quiz app එකටත්.'),
+  N('Unit 06 දැන් යන කොටස: tute + paper ප්‍රශ්න'),
+  O('Unit 01 short note + paper')],
+ [O('Unit 03 flash cards + revision'),
+  N('අලුත් පාඩම: notes + tute (පන්තිය ගිය තැනට)'),
+  O('Unit 03 short note + paper')],
+ [O('Unit 05 flash cards + revision'),
+  N('Unit 06 flash cards + short note'),
+  O('Unit 05 short note + paper')],
+ [O('Unit 06 paper + විවරණය'),
+  N('Units 01–06 mixed paper (වෙලාව එක්ක)'),
+  R('Mixed paper වැරදි + Balance check: ET','ප්‍රගතිය tab එකේ ET ලැයිස්තුවේ ඉතුරු දේවල් ලියාගන්න.')]
 ];
-const ICT_Q=[ // one block each, in date order (Tue = 1 block, Fri = 2 blocks)
- {ti:'Unit 03 notes ලියන්න — 1 කොටස',d:'දැනට උගන්නපු කොටස. ගණන් කරන්න කලින් මේක ඉවර වෙන්න ඕන.',bl:1},
- {ti:'Unit 03 notes ඉවර කරන්න',bl:1},
- {ti:'Unit 01 + Unit 02 full paper ආයේ කරලා වැරදි හදාගන්න',d:'වැරදුණු ප්‍රශ්න විතරක් ආයේ කරන්න.',bl:1},
- {ti:'Unit 03 ගණන් practice',d:'Notes ඉවර නිසා දැන් ගණන් කරන්න පුළුවන්.',bl:1},
- {ti:'Unit 02 short note',d:'පිටු 2–3: definitions, වැදගත් කරුණු, MCQ වල වැරදුණු තැන්.',bl:1},
- {ti:'Unit 01 short note + flash cards',d:'Flash card ප්‍රශ්න ICT quiz app එකටත්.',bl:1},
- {ti:'Past paper book — Unit 03 (1 කොටස) + විවරණ',bl:1},
- {ti:'Past paper book — Unit 03 (2 කොටස) + විවරණ',bl:1},
- {ti:'Unit 02 flash cards + app එකට',bl:1},
- {ti:'Past paper book — Unit 04 (1 කොටස) + විවරණ',bl:1},
- {ti:'Past paper book — Unit 04 (2 කොටස) + විවරණ',bl:1},
- {ti:'Unit 03 ගණන් practice — 2',k:'now'},
- {ti:'ICT recording 1 (ඉස්සරහ පාඩම) + notes',d:'1.5–2x speed. Slides තියෙනවා නම් ඒවා පැත්තකින් තියාගෙන.',bl:1},
- {ti:'ICT recording 3 — 1 කොටස + notes',bl:1},
- {ti:'Unit 01 + Unit 02 පාඩම් papers',k:'now'},
- {ti:'ICT recording 2 + notes',bl:1},
- {ti:'Unit 03 flash cards + app එකට',k:'now'},
- {ti:'ICT recording 3 ඉවර කරලා notes',bl:1},
- {ti:'Units 01–03 mixed paper + දුර්වල කොටස්',k:'now'}
+const ICT_Q=[ // Tuesday + Friday morning blocks, in date order
+ O('Unit 03 notes සම්පූර්ණ කරන්න','දැනට උගන්නපු කොටස ඔක්කොම. Unit 03 ගණන් කරන්න කලින් මේක ඉවර වෙන්නම ඕන.'),
+ O('Unit 03 ගණන් practice','Notes ඉවර නිසා දැන් ගණන් කරන්න පුළුවන්. බැරි ඒවා අඟහරුවාදා පන්තියේ අහන්න.'),
+ O('Unit 01 + 02 full paper ආයේ කරලා වැරදි හදාගන්න','වැරදුණු ප්‍රශ්න විතරක් ආයේ කරන්න. ඒ විවරණය apps වලට.'),
+ O('Past paper book: Unit 03 + විවරණ','Unit 03 notes සහ ගණන් ඉවර නිසා දැන් past paper ප්‍රශ්න.'),
+ O('Unit 01 + 02 short notes','පිටු 2–3 බැගින්: definitions, වැදගත් කරුණු, MCQ වල වැරදුණු තැන්.'),
+ O('Past paper book: Unit 04 + විවරණ'),
+ O('Unit 01 + 02 flash cards + ICT quiz app එකට'),
+ O('ICT recording 1 (ඉස්සරහ පාඩම) + notes','1.5–2x speed. Slides තියෙනවා නම් ඒවා පැත්තකින් තියාගෙන.'),
+ O('ICT recording 2 + notes','1.5–2x speed.'),
+ O('ICT recording 3 + notes','1.5–2x speed.'),
+ N('Unit 03 short note + flash cards + ගණන් revision'),
+ R('Units 01–03 mixed paper + Balance check: ICT','වෙලාව තියාගෙන. ඊට පස්සේ ප්‍රගතිය tab එකේ ICT ලැයිස්තුව බලන්න.')
 ];
-const MAG=[
- {ti:'Magazine: group එකත් එක්ක පිටු 8 බෙදාගන්න + මගේ පිටු වල layout sketch',d:'කාටද මොන පිටුව කියලා group chat එකේ ලියලා තියන්න. Fonts සහ පාට ටිකත් එකඟ වෙන්න.'},
- {ti:'Magazine: මගේ පිටු design කරන්න (Photoshop / Illustrator)'},
- {ti:'Magazine: මගේ පිටු ඉවර + group එකේ පිටු එකතු කරන්න',d:'Final file එක මේ සතියේම හදාගන්න. ඊළඟ ඉරිදා polish කරන්න විතරයි.'},
- {ti:'Magazine: final check, export, submit',d:'Deadline අද (නොවැ 8). Export කරලා group එකට share කරන්න.'}
+const DIP_ASG=[ // Thursday 8–9 pm (campus written work)
+ {s:'asg',k:'now',ti:'Diploma assignments ලැයිස්තුව + deadlines + Magazine පිටු වලට text (EN + SI)',d:'Mini Magazine ඇතුළුව ඔක්කොම deadlines ලියාගන්න. ඉරිදා කඩේ PC එකේ කරන්න ඕන ඒවා වෙනම ලකුණු කරන්න.'},
+ {s:'asg',k:'now',ti:'Magazine: text සහ images ලෑස්ති කරන්න (ඉරිදා PC එකට)'},
+ {s:'asg',k:'now',ti:'Magazine: group එකේ පිටු ආවද බලලා final text check'},
+ {s:'asg',k:'now',ti:'Diploma assignments: written කොටස් (deadline ළඟම ඒවා)'},
+ {s:'asg',k:'now',ti:'Diploma assignments: written කොටස් (deadline ළඟම ඒවා)'},
+ {s:'asg',k:'now',ti:'Diploma assignments: ඉතුරු ඒවා ලැයිස්තුව + balance check'}
 ];
-const HEX_A=[ // Sunday app-development block 1 (2:30–4:45)
- {ti:'Hexora site: team එකට කොටස් බෙදලා ඉතුරු වැඩ ලැයිස්තුව හදන්න',d:'උඹ කරන්නේ admin panel සහ quote calculator විතරයි. අනිත් පිටු team එකට.'},
+const SUN_ASG=[ // Sunday 9:30–12:30 at the shop PC
+ {ti:'Magazine: පිටු 8 බෙදාගන්න + මගේ පිටු layout + design පටන් ගන්න',d:'කාටද මොන පිටුව කියලා group chat එකේ ලියන්න. Fonts සහ පාට ටිකත් එකඟ වෙන්න. ඊට පස්සේ Photoshop / Illustrator වලින් design පටන් ගන්න.'},
+ {ti:'Magazine: මගේ පිටු design ඉවර කරලා group එකේ පිටු එකතු කරන්න',d:'Final file එක අද හදාගන්න. ඊළඟ ඉරිදා polish කරලා submit කරන්න විතරයි.'},
+ {ti:'Magazine: final check, export, submit (අද deadline)',d:'උදේම export කරලා submit කරන්න. ඉතුරු වෙලාවේ deadline ළඟම අනිත් assignment එක.'},
+ {ti:'Diploma assignments (deadline ළඟම ඒවා මුලින්)'},
+ {ti:'Diploma assignments (deadline ළඟම ඒවා මුලින්)'},
+ {ti:'Diploma assignments: ඉතුරු ඔක්කොම ඉවර කරන්න'}
+];
+const HEX_A=[ // Sunday 2–5 pm
+ {ti:'Hexora site: team එකට කොටස් බෙදලා ඉතුරු වැඩ ලැයිස්තුව හදන්න',d:'උඹ කරන්නේ admin panel සහ quote calculator. අනිත් පිටු team එකට.'},
  {ti:'Hexora site: Services + Pricing පිටු (USD / LKR) review'},
  {ti:'Hexora site: Project request form + quote calculator'},
  {ti:'Hexora site: Admin panel (requests + quotes)'},
- {ti:'Hexora site: testing (phone + desktop) + Singlish text check'},
- {ti:'Hexora site: launch කරලා customersලාට link එක share කරන්න'},
+ {ti:'Hexora site: testing (phone + desktop) + Singlish text check + speed',d:'අද හවස launch කරනවා. Bugs ලැයිස්තුවක් හදලා පුළුවන් ඒවා දැන්ම හදන්න.'},
  {ti:'A/L Tech Notes app: screens plan + project setup',d:'උඹේ short notes තමා content එක. Coding ඊළඟ මාසෙ.'}
 ];
-const HEX_B=[ // block 2 (5:00–7:00)
- {ti:'Quiz apps: papers ඉක්මනට දාන admin form එකක් හදන්න',d:'Daily quiz / Day papers apps දෙකට ප්‍රශ්න ඉක්මනට දාන්න admin form එකක් හැදුවොත් හැමදාම විනාඩි 5න් වැඩේ ඉවරයි.'},
- {ti:'Hexora site: quote calculator logic + test කරන්න'},
- {ti:'Hexora site: Admin panel — requests list + quotes'},
+const HEX_B=[ // Sunday 6:30–8:30 pm
+ {ti:'Quiz apps: papers ඉක්මනට දාන admin form එකක්',d:'Daily quiz / Day papers apps දෙකට ප්‍රශ්න ඉක්මනට දාන්න form එකක් හැදුවොත් හැමදාම විනාඩි 5න් වැඩේ ඉවරයි.'},
+ {ti:'Hexora site: quote calculator logic + test'},
+ {ti:'Hexora site: Admin panel: requests list + quotes'},
  {ti:'Hexora site: Admin panel ඉවර කරලා bugs හදන්න'},
- {ti:'Hexora site: final polish + speed check'},
- {ti:'ET / SFT quiz apps: flash card ප්‍රශ්න add + maintenance'},
- {ti:'A/L Tech Notes app: idea + features ලැයිස්තුව'}
+ {ti:'Hexora site launch කරලා customersලාට link එක share කරන්න',d:'WhatsApp status / groups වලට link එක. Team එකට thanks!'},
+ {ti:'ET / SFT quiz apps: flash card ප්‍රශ්න add + maintenance'}
 ];
+const CLS_N=[5,5,5,4,4,4];   // old Day papers (class, 7 Q each) per Tuesday = 27
+const OLD_DQ=3;              // old Daily quiz papers (5 Q each) per night = 72 in 24 nights
 
 /* ---------- build plan ---------- */
 const BASE={}, ORDER=[];
 (function build(){
-  let sq=0,eq=0,iq=0,sun=0,cls=0,dp=0;
-  const OLDN={0:4,1:2,2:2,3:2,4:2,5:0,6:0};
+  let sd=0,ed=0,iq=0,td=0,ti=0,sn=0,cls=0,dq=0;
+  const pc=(t,ap)=>{const p=t.split(':').map(Number);return p[0]*60+p[1]};
   for(let iso=START;iso<=END;iso=isoAdd(iso,1)){
     const w=dow(iso), wk=Math.floor(diff(START,iso)/7)+1, L=[];
-    const P=(o)=>{L.push(o);return o};
-    const Q=(item,s,t,e,ap)=>P(Object.assign({s,k:item.bl?'old':(item.k||'now'),t,e,ap},item));
-    const REST=(t,e,ti)=>P({s:'rev',k:'rest',fx:1,t,e,ap:'pm',ti:ti||'විවේකය + කෑම'});
-    const sftQ=(t,e)=>Q(SFT_Q[Math.min(sq++,SFT_Q.length-1)],'sft',t,e,'pm');
-    const ictQ=(t,e)=>Q(ICT_Q[Math.min(iq++,ICT_Q.length-1)],'ict',t,e,'pm');
-    const clsT=(n,t,e)=>{const a=cls+1;if(a>27)return P({s:'ict',k:'now',t,e,ap:'pm',ti:'ICT: වැරදුණු MCQ ප්‍රශ්න revision',d:'පරණ class papers ඔක්කොම ඉවරයි. දැන් විවරණ ලියපු ප්‍රශ්න ආයේ බලන්න.'});
-      const b=Math.min(cls+n,27);cls=b;const c=b-a+1;
-      return P({s:'ict',k:'old',bl:1,t,e,ap:'pm',mc:{c},ti:'පරණ class MCQ papers '+(a===b?'#'+a:'#'+a+'–#'+b),d:'ප්‍රශ්න '+(c*7)+'ක්. ප්‍රශ්නයට විනාඩි 1ක් වගේ. වැරදුණු / අනුමාන කරපු ඒවාට විතරක් විවරණය.'})};
-    const daily=(late)=>{
-      if(late){P({s:'ict',k:'daily',t:'11:10',e:'11:30',ap:'pm',ti:'රෑ 10 Day paper (Daily quiz) + විවරණය',d:'Diploma පන්තිය නිසා අද පරක්කුයි. අද paper එක විතරක්. Daily quiz app එකට දාන්න.'});return}
-      P({s:'ict',k:'daily',t:'10:00',e:'10:30',ap:'pm',ti:'රෑ 10 Day paper (Daily quiz) + විවරණය',d:'ප්‍රශ්න 5. වැරදුණු/අනුමාන ප්‍රශ්න වලට විතරක් විවරණය. ඒකම Daily quiz app එකට දාන්න.'});
-      const n=OLDN[w];if(n&&dp<72){const a=dp+1,b=Math.min(dp+n,72);dp=b;const c=b-a+1;
-        P({s:'ict',k:'old',bl:1,mc:{d:c},t:'10:30',e:c>2?'11:15':'10:55',ap:'pm',ti:'පරණ Day papers (Daily quiz) '+(a===b?'#'+a:'#'+a+'–#'+b),d:'ප්‍රශ්න '+(c*5)+'ක්. විවරණය ලියලා Daily quiz (Day papers) app එකට දාන්න.'})}
+    /* every task is written in 24-hour time and stored as 12-hour pieces (t, e, ap, ap2) */
+    const P=(a,b,o)=>{const x=Object.assign({},o);x.k=x.k||(x.bl?'old':'now');
+      const A=pc(a),B=pc(b),p=(m)=>{const h=Math.floor(m/60)%24,mm=m%60;return {t:(h%12===0?12:h%12)+':'+String(mm).padStart(2,'0'),ap:h>=12?'pm':'am'}};
+      const s=p(A),e=p(B);x.t=s.t;x.ap=s.ap;x.e=e.t;x.ap2=e.ap===s.ap?'':e.ap;x.h=(B-A)/60;L.push(x);return x};
+    const REST=(a,b,ti)=>P(a,b,{s:'rev',k:'rest',fx:1,ti:ti||'විවේකය + කෑම'});
+    const B=(a,b,s,it)=>P(a,b,Object.assign({s},it));
+    const daily=late=>{
+      if(late){P('23:10','23:40',{s:'ict',k:'daily',ti:'රෑ 10 Daily quiz paper + විවරණය',d:'Diploma පන්තිය නිසා අද පරක්කුයි. අද paper එක විතරක්. ප්‍රශ්න 5. Daily quiz app එකට දාන්න.'});return}
+      P('22:00','22:30',{s:'ict',k:'daily',ti:'රෑ 10 Daily quiz paper + විවරණය',d:'ප්‍රශ්න 5. වැරදුණු / අනුමාන කරපු ප්‍රශ්න වලට විතරක් විවරණය. ඒකම Daily quiz app එකට දාන්න.'});
+      if(dq<72){const a=dq+1,b=Math.min(dq+OLD_DQ,72);dq=b;const c=b-a+1;
+        P('22:30','23:00',{s:'ict',bl:1,mc:{d:c},ti:'පරණ Daily quiz papers '+(a===b?'#'+a:'#'+a+'–#'+b),d:'ප්‍රශ්න '+(c*5)+'ක්. විවරණය ලියලා Daily quiz app එකට දාන්න.'})}
     };
-    if(iso===START){
-      P({s:'ict',k:'old',t:'අද',e:'',ap:'',ti:'IT class past papers book එක ඉවර කරන්න',d:'අද මේක ඉවර කරලා හෙට (ඔක් 13) ඉඳන් plan එක පටන් ගන්න.'});
-      P({s:'ict',k:'rev',t:'රෑ',e:'',ap:'',ti:'හෙට ICT පන්තියට ලෑස්ති වෙන්න',d:'හෙට ඉඳන් රෑ 10 Day paper (Daily quiz) එක හැමදාම කරනවා. Daily quiz app එක ලෑස්ති කරගන්න.'});
-    } else if(w===1){ // SFT: 3 blocks
-      sftQ('3:30','5:30');REST('5:30','6:30');sftQ('6:30','8:30');sftQ('8:45','9:45');daily(false);
-    } else if(w===2){ // ICT class day
-      P({s:'ict',k:'cls',fx:1,t:'3:00',e:'5:30',ap:'pm',ti:'ICT පන්තිය',d:'පන්ති MCQ paper එක (ප්‍රශ්න 7) පන්තියේදීම කරන්න.'});
-      REST('5:30','6:30');
-      P({s:'ict',k:'now',t:'6:30',e:'7:15',ap:'pm',ti:'අද class paper එකේ විවරණය',d:'වැරදුණු සහ අනුමාන කරපු ප්‍රශ්න වලට. ඒ ප්‍රශ්නම app එකට.'});
-      P({s:'ict',k:'now',t:'7:15',e:'8:00',ap:'pm',ti:'අද උගන්නපු කොටසේ notes සම්පූර්ණ කරන්න'});
-      clsT(2,'8:00','8:45');
-      ictQ('8:45','9:45');
-      daily(false);
-    } else if(w===3){ // ET: 2 blocks + revision
-      const it=ET_Q[Math.min(eq++,ET_Q.length-1)];
-      Q(it[0],'et','3:30','5:30','pm');REST('5:30','6:30');Q(it[1],'et','6:30','8:30','pm');
-      P({s:'et',k:'now',t:'8:45',e:'9:45',ap:'pm',ti:'ET: අද කරපු දේවල් short revision + paper ප්‍රශ්න 10',d:'සූත්‍ර ටික ආයේ ලියලා බලන්න. වැරදුණු ඒවා ලකුණු කරගන්න.'});
-      daily(false);
-    } else if(w===4){ // Campus day
-      if(wk<=6){
-        P({s:'dip',k:'old',bl:1,t:'3:30',e:'5:30',ap:'pm',ti:'Diploma පාඩම '+wk+': slides/PDF වලින් notes skeleton',d:'Recording බලන්න කලින් slides වලින් headings සහ වැදගත් කරුණු ලියාගන්න. එතකොට recording එකේ බලන්න ඕන තැන් විතරක් පේනවා.'});
-        REST('5:30','6:30');
-        P({s:'dip',k:'old',bl:1,t:'6:30',e:'8:30',ap:'pm',ti:'Diploma පාඩම '+wk+': වැදගත් recordings (2x) + notes සම්පූර්ණ',d:'Skeleton එකේ හිස් තැන් වලට අදාළ කොටස් විතරක් බලන්න.'});
-      } else {
-        P({s:'dip',k:'old',bl:1,t:'3:30',e:'5:30',ap:'pm',ti:'Diploma පාඩම් 1–6 notes check + revision'});
-        REST('5:30','6:30');
-        P({s:'dip',k:'old',bl:1,t:'6:30',e:'8:30',ap:'pm',ti:'Diploma: ඉතුරු recordings / notes'});
-      }
-      if(wk>=8)P({s:'dip',k:'rev',t:'8:45',e:'9:45',ap:'pm',ti:'Balance check — Diploma',d:'පාඩම් 6ටම notes තියෙනවද බලලා ඉතුරු ලැයිස්තුව හදන්න.'});
-      else if(wk>=2)P({s:'dip',k:'old',bl:1,t:'8:45',e:'9:45',ap:'pm',ti:'Diploma පාඩම '+(wk-1)+': notes review + පාඩම් කරන්න',d:'ගිය සතියේ හදපු notes එක කියවලා වැදගත් කරුණු පාඩම් කරන්න.'});
-      else P({s:'asg',k:'now',t:'8:45',e:'9:45',ap:'pm',ti:'Diploma assignments ලැයිස්තුව + deadlines ලියාගන්න',d:'Mini Magazine ඇතුළුව ඔක්කොම. ඉරිදා කඩේ PC එකේදී කරන්න ඕන ඒවා වෙනම ලකුණු කරන්න.'});
-      daily(false);
-    } else if(w===5){ // Friday: ICT backlog (first Friday = SFT deadline push) + Diploma class
-      if(iso==='2026-10-16'){
-        sftQ('3:30','5:15');REST('5:15','6:00');sftQ('6:00','7:15');
-        P({s:'sft',k:'now',t:'7:15',e:'8:00',ap:'pm',ti:'Unit 04 flash cards වලට ප්‍රශ්න/උත්තර ලැයිස්තුව',d:'Card 30–40ට ඕන ප්‍රශ්න ටික notes එකෙන් තෝරලා ලියාගන්න. ඊළඟ සඳුදා cards හදන්න ලේසියි.',bl:1});
-      } else {
-        ictQ('3:30','5:15');REST('5:15','6:00');ictQ('6:00','7:15');clsT(2,'7:15','8:00');
-      }
-      P({s:'dip',k:'cls',fx:1,t:'8:00',e:'11:00',ap:'pm',ti:'Diploma පන්තිය (live)',d:'පන්තියේදීම කෙටි notes ලියාගන්න. ඉරිදා සම්පූර්ණ කරනවා.'});
-      daily(true);
-    } else if(w===6){ // Saturday classes
-      P({s:'et',k:'cls',fx:1,t:'7:30',e:'9:30',ap:'am',ti:'ET පන්තිය'});
-      P({s:'sft',k:'cls',fx:1,t:'10:00',e:'12:00',ap:'am',ti:'SFT පන්තිය',d:iso==='2026-10-24'?'Unit 04 flash cards අද ගෙනියන්න.':''});
-      P({s:'et',k:'now',t:'1:30',e:'3:30',ap:'pm',ti:iso==='2026-10-17'?'Unit 06 (6.4 සිට) notes සම්පූර්ණ + tute':'අද ET පන්තියේ notes සම්පූර්ණ + tute',d:'පන්තියේ දේ එදාම. මේක කළොත් ET වල අලුත් backlog එකක් හැදෙන්නේ නෑ.'});
-      P({s:'sft',k:'now',t:'4:00',e:'5:30',ap:'pm',ti:'අද SFT පන්තියේ notes + Unit 01/03 tute',d:'පන්තිය ගිය තැනට.'});
-      P({s:'dip',k:'cls',fx:1,t:'8:00',e:'11:00',ap:'pm',ti:'Diploma පන්තිය (live)'});
-      daily(true);
-    } else if(w===0){ // Sunday: assignments (shop PC) + app development
-      const i=sun++;
-      if(i<4){P(Object.assign({s:'asg',k:'now',t:'8:00',e:'10:30',ap:'am',bl:1},MAG[i]));
-        P({s:'asg',k:'now',bl:1,t:'10:30',e:'12:00',ap:'am',ti:i===0?'දැන් තියෙන diploma assignments ලැයිස්තුව + deadlines ලියාගන්න':'Deadline ළඟම diploma assignment එක'});}
-      else P({s:'asg',k:'now',bl:1,t:'8:00',e:'12:00',ap:'am',ti:'Diploma assignments (deadline ළඟම ඒවා මුලින්)'});
-      REST('12:00','1:30');
-      P({s:'dip',k:'now',t:'1:30',e:'2:15',ap:'pm',ti:'මේ සතියේ Diploma පන්ති notes (සිකු + සෙන)'});
-      P(Object.assign({s:'hex',k:'now',bl:1,t:'2:30',e:'4:45',ap:'pm'},HEX_A[Math.min(i,HEX_A.length-1)]));
-      P(Object.assign({s:'hex',k:'now',bl:1,t:'5:00',e:'7:00',ap:'pm'},HEX_B[Math.min(i,HEX_B.length-1)]));
-      P({s:'rev',k:'rev',t:'7:30',e:'8:30',ap:'pm',ti:'සතියේ review + මඟ ඇරුණු වැඩ',d:'"අද" tab එකේ මඟ ඇරුණු ලැයිස්තුවෙන් පුළුවන් තරම් කරන්න. ඊළඟ සතිය බලලා ලෑස්ති වෙන්න.'});
-      daily(false);
+    const subjDay=(s,day,last)=>{ // Mon / Wed template
+      B('09:30','12:30',s,day[0]);REST('12:30','14:00','දවල් කෑම + විවේකය');
+      B('14:00','17:00',s,day[1]);REST('17:00','19:00','විවේකය · ව්‍යායාම · නාන්න');
+      B('19:00','21:00',day[2].s||s,day[2]);REST('21:00','22:00','රෑ කෑම');daily(false)};
+    if(w===1){subjDay('sft',SFT_DAYS[Math.min(sd++,SFT_DAYS.length-1)])}
+    else if(w===3){subjDay('et',ET_DAYS[Math.min(ed++,ET_DAYS.length-1)])}
+    else if(w===2){ // ICT + class
+      const it=ICT_Q[Math.min(iq++,ICT_Q.length-1)];B('09:30','12:30','ict',it);
+      REST('12:30','14:15','දවල් කෑම + පන්තියට යන්න');
+      P('15:00','17:30',{s:'ict',k:'cls',fx:1,ti:'ICT පන්තිය',d:'Day paper එක (ප්‍රශ්න 7) පන්තියේදීම කරන්න.'});
+      REST('17:30','19:00','ගෙදර එන්න + විවේකය');
+      P('19:00','19:30',{s:'ict',k:'now',ti:'අද Day paper එකේ විවරණය',d:'වැරදුණු සහ අනුමාන කරපු ප්‍රශ්න වලට. ඒ ප්‍රශ්නම Day papers app එකට.'});
+      P('19:30','20:30',{s:'ict',k:'now',ti:'අද උගන්නපු කොටසේ notes සම්පූර්ණ කරන්න',d:'පන්තියේ දේ එදාම. එතකොට ICT වල අලුත් backlog එකක් හැදෙන්නේ නෑ.'});
+      const n=CLS_N[Math.min(td++,CLS_N.length-1)];
+      if(cls<27){const a=cls+1,b=Math.min(cls+n,27);cls=b;const c=b-a+1;
+        P('20:30','21:30',{s:'ict',bl:1,mc:{c},ti:'පරණ Day papers (පන්තියේ) #'+a+'–#'+b,d:'ප්‍රශ්න '+(c*7)+'ක්. ප්‍රශ්නයට විනාඩි 1–1.5ක්. වැරදුණු / අනුමාන කරපු ඒවාට විතරක් විවරණය, Day papers app එකට.'})}
+      else P('20:30','21:30',{s:'ict',k:'now',ti:'ICT: වැරදුණු MCQ ප්‍රශ්න revision',d:'පරණ Day papers ඔක්කොම ඉවරයි. විවරණ ලියපු ප්‍රශ්න ආයේ බලන්න.'});
+      REST('21:30','22:00','රෑ කෑම');daily(false);
     }
-    L.forEach((t,i)=>{t.id=iso+'-'+i;t.date=iso;
-      t.h=(t.t&&t.e&&t.ap)?(()=>{let a=mins(t.t,t.ap),b=mins(t.e,t.ap);if(b<a)b+=12*60;return (b-a)/60})():0;});
+    else if(w===4){ // Campus
+      const n=Math.min(ti+1,6),i=ti++;
+      B('09:30','12:30','dip',O('Diploma පාඩම '+n+': slides / PDF වලින් notes skeleton',(n===1?'පාඩම 1 = assignment එකට අදාළ පාඩම (Photoshop / Illustrator). ':'')+'Recording බලන්න කලින් slides වලින් headings සහ වැදගත් කරුණු ලියාගන්න. එතකොට recording එකේ බලන්න ඕන තැන් විතරක් පේනවා.'));
+      REST('12:30','14:00','දවල් කෑම + විවේකය');
+      B('14:00','17:00','dip',O('Diploma පාඩම '+n+': වැදගත් recordings (2x) + notes සම්පූර්ණ','Skeleton එකේ හිස් තැන් වලට අදාළ කොටස් විතරක් බලන්න. ඔක්කොම බලන්න ගියොත් ඉවර වෙන්නේ නෑ.'));
+      REST('17:00','19:00','විවේකය · ව්‍යායාම · නාන්න');
+      P('19:00','20:00',{s:'dip',k:'now',ti:i===0?'ගිය සිකු + සෙන Diploma පන්ති notes සම්පූර්ණ':'මේ සතියේ Diploma පන්ති notes (සිකු + සෙන)',d:'පන්තියේදී ලියාගත්ත කෙටි notes පිළිවෙළට.'});
+      P('20:00','21:00',DIP_ASG[Math.min(i,DIP_ASG.length-1)]);
+      REST('21:00','22:00','රෑ කෑම');daily(false);
+    }
+    else if(w===5){ // Friday: ICT block + buffer + Diploma class
+      const it=ICT_Q[Math.min(iq++,ICT_Q.length-1)];B('09:30','12:30','ict',it);
+      REST('12:30','14:00','දවල් කෑම + විවේකය');
+      P('14:00','17:00',{s:'rev',k:'buf',fx:1,ti:'Buffer: මේ සතියේ මඟ ඇරුණු වැඩ',
+        d:(iso==='2026-10-23'?'SFT Unit 04 flash cards ඉතුරු නම් මුලින්ම ඒවා. හෙට පන්තියට ගෙනියන්න ඕන. ':'')+'සතියේ මඟ ඇරුණු වැඩ "මාරු කරන්න" බොත්තමෙන් මෙතනට එනවා. කිසිම දෙයක් මඟ ඇරිලා නැත්නම් flash cards revision, past paper ප්‍රශ්න, නැත්නම් විවේකය.'});
+      REST('17:00','19:30','විවේකය · ව්‍යායාම · නාන්න');
+      P('20:00','23:00',{s:'dip',k:'cls',fx:1,ti:'Diploma පන්තිය (live)',d:'පන්තියේදීම කෙටි notes ලියාගන්න. බ්‍රහස්පතින්දා සම්පූර්ණ කරනවා.'});
+      daily(true);
+    }
+    else if(w===6){ // Saturday classes
+      P('07:30','09:30',{s:'et',k:'cls',fx:1,ti:'ET පන්තිය',d:'අද උදේ 6:30ට නැගිටින්න.'});
+      P('10:00','12:00',{s:'sft',k:'cls',fx:1,ti:'SFT පන්තිය',d:iso==='2026-10-24'?'Unit 04 flash cards අද ගෙනියන්න.':''});
+      REST('12:00','13:30','දවල් කෑම + විවේකය');
+      P('13:30','15:30',{s:'et',k:'now',ti:'අද ET පන්තියේ notes සම්පූර්ණ + tute',d:'පන්තියේ දේ එදාම. මේක කළොත් ET වල අලුත් backlog එකක් හැදෙන්නේ නෑ.'});
+      P('15:45','17:45',{s:'sft',k:'now',ti:'අද SFT පන්තියේ notes සම්පූර්ණ + tute',d:'පන්තිය ගිය තැනට. 5:45 – 8 හිස්: මඟ ඇරුණු පොඩි වැඩක් තියෙනවා නම් මෙතනට.'});
+      P('20:00','23:00',{s:'dip',k:'cls',fx:1,ti:'Diploma පන්තිය (live)'});
+      daily(true);
+    }
+    else if(w===0){ // Sunday: assignments (shop PC) + app development
+      const i=sn++;
+      const sa=SUN_ASG[Math.min(i,SUN_ASG.length-1)];
+      P('09:30','12:30',Object.assign({s:'asg',k:'now'},sa,{d:'කඩේ PC එකේ. '+(sa.d||'')}));
+      REST('12:30','14:00','දවල් කෑම + විවේකය');
+      P('14:00','17:00',Object.assign({s:'hex',k:'now'},HEX_A[Math.min(i,HEX_A.length-1)]));
+      REST('17:00','18:30','විවේකය');
+      P('18:30','20:30',Object.assign({s:'hex',k:'now'},HEX_B[Math.min(i,HEX_B.length-1)]));
+      P('20:30','21:15',{s:'rev',k:'rev',ti:'සතියේ review + ඊළඟ සතිය බලන්න',d:'ප්‍රගතිය tab එකේ මඟ ඇරුණු වැඩ බලලා "මාරු කරන්න" එකෙන් සිකුරාදා buffer එකට දාන්න.'});
+      REST('21:15','22:00','රෑ කෑම');daily(false);
+    }
+    L.forEach((t,i)=>{t.id=iso+'-'+i;t.date=iso;if(t.d==='')delete t.d});
     BASE[iso]={iso,w,wk,tasks:L};ORDER.push(iso);
   }
 })();
 
 /* ---------- day label ---------- */
-function dayKey(d){return d===START?['පරණ වැඩ ඉවර කරන දවස','ict']:d==='2026-10-16'?['SFT deadline දවස · Diploma පන්තිය','sft']:DAYTYPE[dow(d)]}
+function dayKey(d){return d===END?['SFT දවස · අවසාන balance check','sft']:d==='2026-10-23'?['Buffer දවස · flash cards ඉවරද බලන්න','mix']:DAYTYPE[dow(d)]}
 
 /* ---------- time helpers (12-hour pieces <-> minutes) ---------- */
-const endMin=t=>{let a=mins(t.t,t.ap),b=mins(t.e,t.ap2||t.ap);if(b<=a)b+=720;return b};
+const endMin=t=>{let a=mins(t.t,t.ap),b=mins(t.e,t.ap2||t.ap);if(b<=a)b+=720;if(b<=a)b+=720;return b};
 const startMin=t=>mins(t.t,t.ap);
 function toPieces(m){m=((m%1440)+1440)%1440;const h=Math.floor(m/60),mm=m%60,ap=h>=12?'pm':'am',h12=h%12===0?12:h%12;
   return {t:h12+':'+String(mm).padStart(2,'0'),ap}}
@@ -1122,7 +1142,7 @@ function makePlan(st){
     if(L.every(t=>t.ap&&t.e))L.sort((a,b)=>startMin(a)-startMin(b)||a._i-b._i);
     L.forEach((t,i)=>{t.id=t.id;t.date=d;
       t.h=(t.t&&t.e&&t.ap)?(endMin(t)-startMin(t))/60:0;t.clash=0;delete t._i});
-    const T=L.filter(t=>t.ap&&t.e&&t.k!=='rest');
+    const T=L.filter(t=>t.ap&&t.e&&t.k!=='rest'&&t.k!=='buf');
     for(let i=0;i<T.length;i++)for(let j=i+1;j<T.length;j++)if(startMin(T[j])<endMin(T[i])&&startMin(T[i])<endMin(T[j])){T[i].clash=1;T[j].clash=1}
   });
   const ALL=ORDER.flatMap(d=>P[d].tasks);
@@ -1183,7 +1203,7 @@ const IC={
   swap:sv('<path d="M4 8h15M15 4l4 4-4 4M20 16H5M9 12l-4 4 4 4"/>'),
   star:sv('<path d="M12 3l2.7 5.6 6.1.8-4.5 4.2 1.1 6.1L12 16.8l-5.4 2.9 1.1-6.1-4.5-4.2 6.1-.8z"/>')
 };
-const KIND_IC={old:'old',now:'now',cls:'cls',daily:'daily',rev:'rev',rest:'rest'};
+const KIND_IC={old:'old',now:'now',cls:'cls',daily:'daily',rev:'rev',buf:'swap',rest:'rest'};
 const TABS=[['today','අද'],['week','සතිය'],['progress','ප්‍රගතිය'],['tools','මෙවලම්'],['rules','ක්‍රමය']];
 const SKINS=[['light','Light','sun'],['dark','Dark','moon'],['black','Black','star']];
 
@@ -1192,8 +1212,9 @@ const LS='balance-plan-v1';
 const DEF_SET={lead:10,cls:false,rest:false,am:true,pm:true,haptic:true,exam:'',fm:25,sb:5};
 function normState(o){o=o&&typeof o==='object'?o:{};
   const obj=x=>x&&typeof x==='object'&&!Array.isArray(x)?x:{},arr=x=>Array.isArray(x)?x:[];
-  return {done:obj(o.done),edits:obj(o.edits),hidden:obj(o.hidden),custom:arr(o.custom),notes:obj(o.notes),scores:arr(o.scores),qs:arr(o.qs),focus:obj(o.focus),
-    settings:Object.assign({},DEF_SET,obj(o.settings)),ts:+o.ts||0}}
+  const fresh=o.pv===PLAN_V; // ids are date-index: an older plan's ticks / edits / notes would land on different tasks
+  return {done:fresh?obj(o.done):{},edits:fresh?obj(o.edits):{},hidden:fresh?obj(o.hidden):{},custom:arr(o.custom).filter(c=>c&&c.date>=START&&c.date<=END),notes:fresh?obj(o.notes):{},
+    scores:arr(o.scores),qs:arr(o.qs),focus:obj(o.focus),settings:Object.assign({},DEF_SET,obj(o.settings)),ts:+o.ts||0,pv:PLAN_V}}
 let state=normState();
 try{state=normState(JSON.parse(localStorage.getItem(LS)||'null'))}catch(e){}
 applyPlan(state);
@@ -1202,7 +1223,7 @@ function mergeStates(a,b){a=normState(a);b=normState(b);const n=a.ts>=b.ts?a:b,o
   const byId=(x,y)=>{const m=new Map();[...y,...x].forEach(r=>r&&r.id&&m.set(r.id,r));return [...m.values()]};
   const fo={};[a.focus,b.focus].forEach(f=>Object.keys(f).forEach(d=>{fo[d]=fo[d]||{};Object.keys(f[d]).forEach(k=>{fo[d][k]=Math.max(fo[d][k]||0,f[d][k]||0)})}));
   return {done:Object.assign({},o.done,n.done),edits:Object.assign({},o.edits,n.edits),hidden:Object.assign({},o.hidden,n.hidden),custom:byId(n.custom,o.custom),
-    notes:Object.assign({},o.notes,n.notes),scores:byId(n.scores,o.scores),qs:byId(n.qs,o.qs),focus:fo,settings:Object.assign({},o.settings,n.settings),ts:Math.max(a.ts,b.ts)}}
+    notes:Object.assign({},o.notes,n.notes),scores:byId(n.scores,o.scores),qs:byId(n.qs,o.qs),focus:fo,settings:Object.assign({},o.settings,n.settings),ts:Math.max(a.ts,b.ts),pv:PLAN_V}}
 let ui={tab:'today',sel:null,wk:null,collapsed:false,skin:'auto'};
 try{const u=JSON.parse(localStorage.getItem(LS+'-ui')||'null');if(u){if(u.tab)ui.tab=u.tab==='backlog'?'progress':u.tab;ui.collapsed=!!u.collapsed;if(u.skin)ui.skin=u.skin}}catch(e){}
 if(!TABS.some(t=>t[0]===ui.tab))ui.tab='today';
@@ -1243,15 +1264,17 @@ async function initDb(){try{
 
 /* ---------- metrics ---------- */
 const MCQ_TOTAL=27*7+72*5;
+/* what a subject card on the progress tab lists: backlog for A/L + diploma, every planned item for assignments / Hexora */
+function progItems(g,withMc){return ALL.filter(t=>t.s===g&&!t.fx&&t.k!=='rest'&&t.k!=='daily'&&(withMc||!t.mc)&&(t.bl||((g==='asg'||g==='hex')&&!t.cu)))}
 function metric(key){
   const [kind,arg]=key.split(':');let list;
   if(kind==='day')list=PLAN[arg].tasks.filter(t=>!t.fx&&t.k!=='rest');
   else if(kind==='all')list=CHECKABLE;
   else if(kind==='bl')list=ALL.filter(t=>t.bl&&!t.fx);
-  else if(kind==='subj')list=ALL.filter(t=>t.s===arg&&t.bl);
+  else if(kind==='subj')list=progItems(arg,true);
   else if(kind==='mcqc'||kind==='mcqd'){const f=kind==='mcqc'?'c':'d',tot=kind==='mcqc'?27:72;let a=0;ALL.forEach(t=>{if(t.mc&&t.mc[f]&&state.done[t.id])a+=t.mc[f]});return {a,b:tot,p:Math.round(a/tot*100)}}
   else if(kind==='mcqleft'){let l=MCQ_TOTAL;ALL.forEach(t=>{if(t.mc&&state.done[t.id])l-=(t.mc.c||0)*7+(t.mc.d||0)*5});return {a:l,b:MCQ_TOTAL,p:Math.round((MCQ_TOTAL-l)/MCQ_TOTAL*100)}}
-  else if(kind==='focus'){const a=focusDay(todayISO());return {a,b:120,p:Math.min(100,Math.round(a/120*100))}}
+  else if(kind==='focus'){const a=focusDay(todayISO());return {a,b:240,p:Math.min(100,Math.round(a/240*100))}}
   else if(kind==='time'){const a=diff(START,clampDay(TODAY)),b=diff(START,END);return {a:Math.max(0,diff(TODAY,END)),b,p:Math.round(a/b*100)}}
   const a=list.filter(t=>state.done[t.id]).length;return {a,b:list.length,p:list.length?Math.round(a/list.length*100):0};
 }
@@ -1297,7 +1320,7 @@ function badgesHTML(t){const b=[];
 function taskCard(t,i,opts){opts=opts||{};const S=SUBJ[t.s],done=!!state.done[t.id];
   if(t.k==='rest')return `<div class="rest stag" style="--i:${i}">${IC.rest}<span class="mono">${t.t}–${t.e}</span><span>${esc(t.ti)}</span></div>`;
   const live=!opts.showDate&&isLive(t);
-  return `<article class="tk stag ${t.fx?'fixed':''} ${done?'done':''} ${live?'live':''}" data-tid="${t.id}" style="--c:${S.c};--c2:${S.c2};--i:${i}">
+  return `<article class="tk stag ${t.fx?'fixed':''} ${t.k==='buf'?'buf':''} ${done?'done':''} ${live?'live':''}" data-tid="${t.id}" style="--c:${S.c};--c2:${S.c2};--i:${i}">
     <div class="ico">${IC[KIND_IC[t.k]]||IC.now}</div>
     <div class="tb"><div class="r1"><span class="tm">${timeHTML(t)}</span><span class="pill">${S.n}</span><span class="kind ${t.k==='old'?'old':''}">${KIND[t.k]||''}</span>
       ${opts.showDate?`<span class="kind">· ${fmt(t.date)} ${DSH[dow(t.date)]}</span>`:''}${live?'<span class="live-b">දැන්</span>':''}</div>
@@ -1359,18 +1382,20 @@ function viewWeek(){
   </div><div class="weekgrid">${cards}</div>`;
 }
 function viewProgress(){
+  const lastMc=f=>{const l=ALL.filter(t=>t.mc&&t.mc[f]);return l.length?l[l.length-1].date:END};
   const DL=[['2026-10-24','SFT Unit 04 flash cards','සෙනසුරාදා පන්තියට','sft'],['2026-11-08','Mini Magazine submit','DIT10603 group assignment','asg'],
-    ['2026-11-22','Hexora site launch','team එකත් එක්ක','hex'],['2026-11-27','පරණ MCQ papers ඉවරයි','class 27 + day 72','ict'],['2026-11-30','Balance','පරණ වැඩ ඉවරයි','et']];
+    [lastMc('d'),'පරණ Daily quiz papers ඉවරයි','papers 72 · රෑ 10:30','ict'],['2026-11-22','Hexora site launch','team එකත් එක්ක','hex'],
+    [lastMc('c'),'පරණ Day papers ඉවරයි','පන්තියේ papers 27 · අඟහරු රෑ','ict'],['2026-11-30','Balance','පරණ වැඩ ඉවරයි','et']];
   const ex=state.settings.exam;if(ex&&ex>=TODAY)DL.push([ex,'A/L විභාගය','ඔක්කොම ලෑස්ති වෙන්න','ict']);DL.sort((x,y)=>x[0]<y[0]?-1:1);
   const dls=DL.map(([d,t,s,k],i)=>{const n=diff(TODAY,d);return `<div class="dl stag ${n<0?'past':''}" style="--i:${i+1};--c:${SUBJ[k].c};--c2:${SUBJ[k].c2}"><span class="n">${n<0?'✓':n}</span>
     <span class="t">${t}<small>${fmt(d)} · ${n<0?'ඉවරයි':n===0?'අද':'දින '+n+'කින්'} · ${s}</small></span></div>`}).join('');
   const missed=CHECKABLE.filter(t=>t.date<TODAY&&!state.done[t.id]);
   const groups=['sft','et','ict','dip','asg','hex'];
-  const sub={sft:'Unit 02, 04 + short notes, papers',et:'Units 01, 03, 05, 06',ict:'Units 01–03, MCQ, past paper book',dip:'පාඩම් 6 · recordings ~80',asg:'Magazine + අනිත් assignments',hex:'Customer site + apps'};
+  const sub={sft:'Unit 02, 04 + short notes, papers · සඳුදා',et:'Units 01, 03, 05, 06 · බදාදා',ict:'Units 01–03, MCQ, past paper book · අඟ + සිකු',dip:'පාඩම් 6 · recordings ~80 · බ්‍රහස්පතින්දා',asg:'Magazine + අනිත් assignments · ඉරිදා + බ්‍රහ',hex:'Customer site + apps · ඉරිදා'};
   const gi={sft:'old',et:'old',ict:'daily',dip:'cls',asg:'now',hex:'now'};
-  const cards=groups.map((g,i)=>{const S=SUBJ[g];const items=ALL.filter(t=>t.s===g&&t.bl&&!t.mc);
-    const meters=g==='ict'?`<div class="meter"><span>පරණ class MCQ papers</span><span class="mono" data-frac="mcqc">0/27</span><span class="gbar"><i data-bar="mcqc" style="width:0"></i></span>
-      <span>පරණ Day papers (Daily quiz)</span><span class="mono" data-frac="mcqd">0/72</span><span class="gbar"><i data-bar="mcqd" style="width:0"></i></span></div>`:'';
+  const cards=groups.map((g,i)=>{const S=SUBJ[g];const items=progItems(g);
+    const meters=g==='ict'?`<div class="meter"><span>පරණ Day papers (පන්තියේ)</span><span class="mono" data-frac="mcqc">0/27</span><span class="gbar"><i data-bar="mcqc" style="width:0"></i></span>
+      <span>පරණ Daily quiz papers</span><span class="mono" data-frac="mcqd">0/72</span><span class="gbar"><i data-bar="mcqd" style="width:0"></i></span></div>`:'';
     return `<section class="card bcard stag" style="--i:${i+3};--c:${S.c};--c2:${S.c2}">
       <div class="bhead"><span class="ico">${IC[gi[g]]}</span><div><h3>${S.n}</h3><small>${sub[g]}</small></div>${ringSVG('subj:'+g,'sm',S.c)}</div>
       ${meters}${items.map(t=>{const dn=!!state.done[t.id],late=!dn&&t.date<TODAY;return `<div class="bitem ${dn?'done':''}" data-tid="${t.id}">
@@ -1378,7 +1403,7 @@ function viewProgress(){
     </section>`}).join('');
   return `
   <section class="phero stag" style="--i:0">
-    <div><div class="eyebrow" style="color:#AEB4DA">ඔක් 12 → නොවැ 30</div>
+    <div><div class="eyebrow" style="color:#AEB4DA">ඔක් 19 → නොවැ 30</div>
       <h2>නොවැම්බර් 30 වෙද්දි <em>පරණ වැඩ ඉවරයි</em>, අලුත් වැඩ නතර වෙන්නේ නෑ.</h2></div>
     <div class="stats">
       <div class="stat"><b data-num="time">0</b><span>නොවැ 30ට දින</span><div class="sbar"><i data-bar="time" style="width:0"></i></div></div>
@@ -1389,7 +1414,7 @@ function viewProgress(){
   </section>
   <div class="dls">${dls}</div>
   ${reportHTML()}
-  ${missed.length?`<details class="missed stag" style="--i:2"><summary><span class="n">${missed.length}</span><span>මඟ ඇරුණු වැඩ<small>සිකුරාදා buffer එකේ හරි, ඉරිදා 7:30 review එකේ හරි, ඊළඟ ඒ subject දවසේ හරි කරන්න.</small></span><span class="chev">${IC.down.replace('<svg','<svg width="18" height="18"')}</span></summary>
+  ${missed.length?`<details class="missed stag" style="--i:2"><summary><span class="n">${missed.length}</span><span>මඟ ඇරුණු වැඩ<small>"මාරු කරන්න" ඔබලා සිකුරාදා buffer එකට (ප.ව. 2–5) දාන්න.</small></span><span class="chev">${IC.down.replace('<svg','<svg width="18" height="18"')}</span></summary>
     <div class="tl">${missed.slice().reverse().map((t,i)=>taskCard(t,i,{showDate:true})).join('')}</div></details>`:''}
   <h2 class="sec">Subject අනුව පරණ වැඩ</h2>
   <p class="note" style="margin-top:-6px">රතු පාටින් තියෙන දිනය කියන්නේ ඒ වැඩේ මඟ ඇරිලා කියන එක.</p>
@@ -1404,29 +1429,30 @@ function viewRules(){
   return `
   <div class="cols">
     <section class="card stag" style="--i:0"><h3>මේ plan එක වැඩ කරන්නේ මෙහෙමයි</h3><ol>
-      <li><b>දවසට එක subject එකයි.</b><span>සඳු SFT, අඟහරු ICT, බදා ET, බ්‍රහස්පතින්දා Campus (Diploma). සිකුරාදා buffer: මඟ ඇරුණු ICT/A-L වැඩ + රෑ Diploma පන්තිය. සෙනසුරාදා පන්ති (ET+SFT). ඉරිදා App development (Hexora) + assignments + review.</span></li>
-      <li><b>පළමු block එක පරණ වැඩ, දෙවැන්න දැන් යන වැඩ.</b><span>පරණ වැඩ ඉවර වෙනකන් හැම subject දවසකම මුල් පැය 2 පරණ වැඩ වලට.</span></li>
-      <li><b>පන්තියේ දේ එදාම.</b><span>සෙනසුරාදා හවස ET/SFT notes, අඟහරුවාදා රෑ ICT class paper සහ notes. මේක කළොත් අලුත් backlog එකක් හැදෙන්නේ නෑ.</span></li>
-      <li><b>රෑ 10 Day paper (Daily quiz) එක කවදාවත් මඟ අරින්න එපා.</b><span>විනාඩි 30යි. ඒ ප්‍රශ්නයි විවරණයයි තමා ICT apps වල content එක.</span></li>
-      <li><b>වැඩක් මඟ ඇරුණොත්.</b><span>සිකුරාදා buffer එකේ හරි ඉරිදා 7:30 review එකේ හරි කරන්න. එකම subject එකේ මඟ ඇරුණු වැඩ 2කට වඩා එකතු වුණොත්, ඊළඟ ඒ subject දවසේ "දැන් යන" block එකෙන් බාගයක් පරණ වැඩට දෙන්න.</span></li>
+      <li><b>දවසට එක subject එකයි.</b><span>සඳු SFT · අඟහරු ICT (+ පන්තිය) · බදා ET · බ්‍රහස්පතින්දා Campus (Diploma + assignments) · සිකු ICT + buffer + රෑ Diploma පන්තිය · සෙන ET/SFT පන්ති + notes · ඉරිදා assignments + App development.</span></li>
+      <li><b>පැය 3ක blocks.</b><span>උදේ 9:30–12:30 <b>පරණ වැඩ</b>, දවල් 2–5 <b>දැන් යන වැඩ</b>, රෑ 7–9 papers / short notes. Block එක ඇතුළේ Focus timer එක 50·10 දාලා පැයට විනාඩි 10 break එකක් ගන්න.</span></li>
+      <li><b>Priority එක.</b><span>1) Deadline තියෙන දේ (SFT cards ඔක් 24, Magazine නොවැ 8). 2) ඊළඟ එකට ඕන කරන පරණ දේ (notes → cards → papers). 3) අනිත් පරණ වැඩ. පන්තියේ අලුත් දේ එදාම notes කරන නිසා අලුත් backlog එකක් හැදෙන්නේ නෑ.</span></li>
+      <li><b>රෑ 10 Daily quiz paper එක කවදාවත් මඟ අරින්න එපා.</b><span>ප්‍රශ්න 5යි, විනාඩි 30යි → Daily quiz app එකට. පන්තියේ දෙන ප්‍රශ්න 7 paper එක තමා <b>Day paper</b> එක → Day papers app එකට.</span></li>
+      <li><b>වැඩක් මඟ ඇරුණොත්.</b><span>"මාරු කරන්න" ඔබන්න. Default එක සිකුරාදා ප.ව. 2–5 buffer එක. ඒක පිරිලා නම් සෙනසුරාදා 5:45–8 හිස් වෙලාවට. ඉරිදා 8:30 review එකේ සතියම බලන්න.</span></li>
     </ol></section>
     <section class="card stag" style="--i:1"><h3>පරණ වැඩ නැතුව අලුත් එක කරන්න බැරි තැන්</h3><div class="dep">
-      <div><span>SFT Unit 04 notes</span><i>→</i><span>Unit 04 flash cards</span><small>Notes ඔක් 16 (සිකු). Cards ඔක් 16–19, 24 පන්තියට.</small></div>
-      <div><span>ICT Unit 03 notes</span><i>→</i><span>Unit 03 ගණන්</span><small>Notes ඔක් 13 සහ 20 (අඟහරු). ගණන් ඔක් 23 (සිකු).</small></div>
-      <div><span>ICT Unit 03 notes + ගණන්</span><i>→</i><span>Past paper book U03/U04</span><small>ඔක් 30 සිට නොවැ 10 වෙනකන් (සිකු/අඟහරු).</small></div>
-      <div><span>ET 6.1–6.3</span><i>→</i><span>6.4 සිට</span><small>ඒ කොටස් දැනටමත් පාඩම් කරලා තියෙන නිසා පන්තිය නතර කරන්න ඕන නෑ. ගණන් ඔක් 28 (බදා).</small></div>
-      <div><span>Diploma slides</span><i>→</i><span>Recordings</span><small>Slides වලින් skeleton එක මුලින්. Recording එකේ බලන්නේ හිස් තැන් විතරයි.</small></div>
+      <div><span>SFT Unit 04 notes</span><i>→</i><span>Unit 04 flash cards</span><small>දෙකම ඔක් 19 (සඳු). ඉතුරු නම් ඔක් 23 buffer එකේ. 24 පන්තියට.</small></div>
+      <div><span>ICT Unit 03 notes</span><i>→</i><span>Unit 03 ගණන්</span><small>Notes ඔක් 20 (අඟ). ගණන් ඔක් 23 (සිකු).</small></div>
+      <div><span>ICT Unit 03 notes + ගණන්</span><i>→</i><span>Past paper book U03/U04</span><small>ඔක් 30 සහ නොවැ 6 (සිකු).</small></div>
+      <div><span>ET 6.1–6.3</span><i>→</i><span>6.4 සිට</span><small>ඒ කොටස් දැනටමත් පාඩම් කරලා තියෙන නිසා පන්තිය නතර කරන්න ඕන නෑ. 6.1–6.3 ගණන් ඔක් 28 (බදා).</small></div>
+      <div><span>Diploma slides</span><i>→</i><span>Recordings</span><small>හැම බ්‍රහස්පතින්දාම පාඩමක්: උදේ slides වලින් skeleton, දවල් recordings 2x වලින් හිස් තැන් විතරක්.</small></div>
+      <div><span>Magazine text (බ්‍රහ)</span><i>→</i><span>Design (ඉරිදා PC)</span><small>ඔක් 25 පටන් ගන්නවා, නොවැ 1 final file, නොවැ 8 submit.</small></div>
     </div></section>
     <section class="card stag" style="--i:2"><h3>ඉක්මනට ඉවර කරන ක්‍රම</h3><ul>
       <li><b>Notes ලියද්දි</b><span>පන්තියේ notes හරි යාළුවෙක්ගේ පොත හරි පැත්තකින් තියාගෙන, මුලින් content එක. Diagrams සහ පාට පස්සේ.</span></li>
       <li><b>Full papers ආයේ කරද්දි</b><span>වැරදුණු ප්‍රශ්න විතරක්. හරි ගිය ඒවා ආයේ කරන්න එපා.</span></li>
-      <li><b>MCQ backlog</b><span>ප්‍රශ්නයට විනාඩි 1යි. විවරණය වැරදුණු ඒවට සහ අනුමාන කරපු ඒවට විතරක්. ඒ විවරණයම apps වලට copy කරන්න.</span></li>
+      <li><b>MCQ backlog</b><span>ප්‍රශ්නයට විනාඩි 1–1.5යි. විවරණය වැරදුණු ඒවට සහ අනුමාන කරපු ඒවට විතරක්. ඒ විවරණයම apps වලට copy කරන්න.</span></li>
       <li><b>Recordings ~80</b><span>ඔක්කොම බලන්න පැය 240ක් යනවා. ඒ නිසා slides මුලින් බලලා, 1.75–2x speed එකෙන් අවශ්‍ය කොටස් විතරක් බලන්න. Group එකේ අය එක්ක පාඩම් බෙදාගත්තොත් තවත් ලේසියි.</span></li>
       <li><b>Flash cards</b><span>Card 30–40ක්. ඉස්සරහ ප්‍රශ්නය, පිටිපස්සේ උත්තරය. ඒ ප්‍රශ්නම quiz apps වලට.</span></li>
       <li><b>Short notes</b><span>පිටු 2–3ක් විතරයි: සූත්‍ර, definitions, ඒකක, වැරදුණු තැන්.</span></li>
     </ul></section>
     <section class="card stag" style="--i:3"><h3>සාමාන්‍ය සතියක පැය</h3><div class="hours">${hrows}</div>
-      <p class="note" style="margin-top:12px">පන්ති වෙලාවලුත් එක්ක. සඳු–බ්‍රහ වැඩ පටන් ගන්නේ ප.ව. 3:30ට, නිදාගන්නේ 11ට (සිකු/සෙන 11:30).</p></section>
+      <p class="note" style="margin-top:12px">පන්ති වෙලාවලුත් එක්ක. උදේ 8:30ට නැගිටිනවා, වැඩ 9:30ට පටන් ගන්නවා. අන්තිම වැඩේ රෑ 11ට (සිකු/සෙන 11:40) ඉවරයි, නිදාගන්නේ 1ට. සෙනසුරාදා ET පන්තිය නිසා 6:30ට නැගිටින්න.</p></section>
   </div>
   <h2 class="sec">සතියේ රාමුව</h2>
   <div class="card frame stag" style="--i:4"><table><tbody>${frame}</tbody></table></div>
@@ -1435,11 +1461,11 @@ function viewRules(){
     <p class="note" style="margin:10px 0 0">Black කියන්නේ AMOLED phone screen වලට ගැළපෙන කළුම කළු පෙනුම.</p></div>
   <h2 class="sec">මම හිතපු දේවල්</h2>
   <div class="card stag" style="--i:6"><ul>
-    <li><b>සතියේ දවස් වල වැඩ ප.ව. 3:30ට පටන් ගන්නවා.</b><span>පාසල් වෙලාව වෙනස් නම්, blocks ටික එකම පිළිවෙළට පස්සට තල්ලු කරන්න.</span></li>
-    <li><b>කඩේ PC එකට යන්නේ ඉරිදා උදේ (assignments 8–12).</b><span>තව දවසක් යන්න පුළුවන් නම් magazine වැඩ ඒ දවසට දාන්න.</span></li>
+    <li><b>සතියේ දවස් වල පාසල් යන්නේ නෑ කියලා හිතුවා.</b><span>උදේ 8:30ට නැගිටින නිසා වැඩ 9:30ට පටන් ගන්නවා. පාසල් යන දවසක් තියෙනවා නම් ඒ දවසේ උදේ block එක "අද කරන්න බැරි වුණා" එකෙන් buffer එකට දාන්න.</span></li>
+    <li><b>කඩේ PC එකට යන්නේ ඉරිදා උදේ (9:30–12:30).</b><span>තව දවසක් යන්න පුළුවන් නම් magazine වැඩ ඒ දවසට දාන්න.</span></li>
     <li><b>Diploma "පාඩම 1" කියන්නේ assignment එකට අදාළ පාඩම.</b><span>Photoshop / Illustrator පාඩම මුලින්ම, ඊට පස්සේ අනිත් ඒවා.</span></li>
-    <li><b>A/L විභාගය 2028.</b><span>දිනය දැනගත්තම Tools → A/L විභාගය එකෙන් දාන්න, countdown එක ඒකට අනුව වැඩ කරයි.</span></li>
-    <li><b>Hexora පිටු team එක හදනවා.</b><span>උඹ කරන්නේ admin panel, quote calculator සහ review විතරයි.</span></li>
+    <li><b>A/L විභාගය 2028.</b><span>දිනය දැනගත්තම මෙවලම් → A/L විභාගය එකෙන් දාන්න, countdown එක ඒකට අනුව වැඩ කරයි.</span></li>
+    <li><b>Hexora පිටු team එක හදනවා.</b><span>උඹ කරන්නේ admin panel, quote calculator සහ review. Launch එක නොවැ 22.</span></li>
   </ul></div>`;
 }
 
@@ -1554,6 +1580,8 @@ viewEl.addEventListener('touchend',e=>{if(!sOk)return;const t=e.changedTouches[0
 const $=(s,r)=>(r||document).querySelector(s);
 const hm=m=>String(Math.floor(m/60)%24).padStart(2,'0')+':'+String(m%60).padStart(2,'0');
 const toMin=v=>{const [h,m]=v.split(':').map(Number);return h*60+m};
+/* start/end from two time inputs; an end after midnight (e.g. 23:30 → 00:30) counts as the same night */
+const spanOf=(sv,ev)=>{if(!sv||!ev)return null;const a=toMin(sv);let b=toMin(ev);if(b<=a&&a>=18*60&&b<=3*60)b+=1440;return b>a?[a,b]:null};
 const shortT=m=>{const p=toPieces(m);return p.t+' '+apTxt(p.ap)};
 const uid=p=>p+Date.now().toString(36)+Math.random().toString(36).slice(2,5);
 const reduced=()=>{try{return matchMedia('(prefers-reduced-motion: reduce)').matches}catch(e){return false}};
@@ -1603,21 +1631,43 @@ function highlight(id){requestAnimationFrame(()=>{const el=document.querySelecto
   el.scrollIntoView({block:'center',behavior:reduced()?'auto':'smooth'})}})}
 
 /* ---------- scheduling helpers ---------- */
-function gapIn(date,dur,P){P=P||PLAN;const busy=P[date].tasks.filter(t=>t.ap&&t.e).map(t=>[startMin(t),endMin(t)]).sort((x,y)=>x[0]-y[0]);
-  const w=dow(date);let cur=(w===0||w===6)?420:930;const hi=23*60+55;
+/* free time on a day: 9:30 am – 11:55 pm (wakes 8:30). Classes, meals and planned work are busy;
+   the Friday buffer is not (it exists to be filled). skip = id of the task being moved (ignored). */
+const DAY_LO=9*60+30,DAY_HI=23*60+55;
+function gapIn(date,dur,P,skip){P=P||PLAN;if(!P[date])return {a:DAY_LO,b:DAY_LO+dur,ok:0};
+  const busy=P[date].tasks.filter(t=>t.ap&&t.e&&t.k!=='buf'&&t.id!==skip).map(t=>[startMin(t),endMin(t)]).sort((x,y)=>x[0]-y[0]);
+  let cur=DAY_LO;
   if(date===TODAY)cur=Math.max(cur,Math.ceil((nowMins()+10)/15)*15);
   for(const [a,b] of busy){if(b<=cur)continue;if(a-cur>=dur)return {a:cur,b:cur+dur,ok:1};cur=Math.max(cur,b)}
-  if(hi-cur>=dur)return {a:cur,b:cur+dur,ok:1};
-  const a=Math.min(cur,22*60);return {a,b:a+dur,ok:0}}
-function subjOnDay(s,d){const key=dayKey(d)[1];if(key===s)return true;if(key==='mix')return ['et','sft','ict','dip'].includes(s);if(key==='dip')return s==='dip'||s==='rev';if(key==='hex')return ['hex','asg','rev'].includes(s);return false}
-function targetDate(t,mode,from){from=from||t.date;
-  if(mode==='next'){const d=isoAdd(from,1);return d<=END?d:null}
-  const nextSun=()=>{for(let d=isoAdd(from,1);d<=END;d=isoAdd(d,1))if(dow(d)===0)return d;return null};
-  if(mode==='sun')return nextSun();
-  for(let d=isoAdd(from,1);d<=END;d=isoAdd(d,1))if(subjOnDay(t.s,d))return d;
-  return nextSun()}
+  if(DAY_HI-cur>=dur)return {a:cur,b:cur+dur,ok:1};
+  const a=Math.max(DAY_LO,Math.min(cur,22*60));return {a,b:a+dur,ok:0}}
+/* the buffer window of a Friday (or the free Saturday evening) */
+function bufGap(date,dur,P,skip){P=P||PLAN;const D=P[date];if(!D)return null;
+  const bf=D.tasks.find(t=>t.k==='buf');if(!bf){const g=gapIn(date,dur,P,skip);return g.ok?g:null}
+  const lo=Math.max(startMin(bf),date===TODAY?Math.ceil((nowMins()+10)/15)*15:0),hi=endMin(bf);
+  const busy=D.tasks.filter(t=>t.ap&&t.e&&t.k!=='buf'&&t.k!=='rest'&&t.id!==skip).map(t=>[startMin(t),endMin(t)]).filter(x=>x[1]>lo&&x[0]<hi).sort((x,y)=>x[0]-y[0]);
+  let cur=lo;for(const [a,b] of busy){if(a-cur>=dur)return {a:cur,b:cur+dur,ok:1};cur=Math.max(cur,b)}
+  return hi-cur>=dur?{a:cur,b:cur+dur,ok:1}:null}
+function subjOnDay(s,d){const key=dayKey(d)[1],w=dow(d);if(key===s)return true;
+  if(key==='mix')return w===5?['ict','sft','et','dip'].includes(s):['et','sft'].includes(s);
+  if(key==='dip')return ['dip','asg','rev'].includes(s);if(key==='hex')return ['hex','asg','rev'].includes(s);return false}
+/* where a task goes when it is moved: mode 'buf' (Friday buffer, then free Saturday evening), 'same' (next day of that subject
+   with room, else buffer), 'next' (tomorrow). Returns {d,a,b,ok} or null. */
+function targetSlot(t,mode,from,P,strict){P=P||PLAN;const dur=Math.min(180,Math.max(30,Math.round((t.h||1)*4)*15));
+  const first=isoAdd(from,1);
+  const bufFrom=f=>{
+    // this week's Friday buffer / Saturday evening first: full length, else the biggest piece (1 hour or more) so it is done before the week ends
+    const wk=[];for(let d=f;d<=END&&d<=isoAdd(f,6);d=isoAdd(d,1)){const w=dow(d);if(w===5||w===6)wk.push(d);if(w===6)break}
+    for(const d of wk){const g=bufGap(d,dur,P,t.id);if(g)return Object.assign({d},g)}
+    for(let m=dur-15;m>=60;m-=15)for(const d of wk){const g=bufGap(d,m,P,t.id);if(g)return Object.assign({d,short:1},g)}
+    for(let d=f;d<=END;d=isoAdd(d,1)){const w=dow(d);if(w!==5&&w!==6)continue;const g=bufGap(d,dur,P,t.id);if(g)return Object.assign({d},g)}
+    for(let d=f;d<=END;d=isoAdd(d,1))if(dow(d)===5){const bf=P[d].tasks.find(x=>x.k==='buf');const a=bf?startMin(bf):14*60;return {d,a,b:a+dur,ok:0}}return null};
+  if(mode==='next'){if(first>END)return null;return Object.assign({d:first},gapIn(first,dur,P,t.id))}
+  if(mode==='same'){for(let d=first;d<=END;d=isoAdd(d,1)){if(dow(d)===5||!subjOnDay(t.s,d))continue;const g=gapIn(d,dur,P,t.id);if(g.ok)return Object.assign({d},g)}if(strict)return null}
+  return bufFrom(first)}
+function targetDate(t,mode,from){const r=targetSlot(t,mode,from||t.date);return r?r.d:null}
 function clashWith(id,date,a,b){const P=PLAN[date];if(!P)return null;
-  return P.tasks.find(x=>x.id!==id&&x.ap&&x.e&&x.k!=='rest'&&startMin(x)<b&&a<endMin(x))||null}
+  return P.tasks.find(x=>x.id!==id&&x.ap&&x.e&&x.k!=='rest'&&x.k!=='buf'&&startMin(x)<b&&a<endMin(x))||null}
 function putSpan(st,t,date,a,b){ // move task t (in plan state st) to date + [a,b)
   if(t.cu){const c=st.custom.find(x=>x.id===t.id);if(c){c.date=date;setSpan(c,a,b)}}
   else{const e=Object.assign({},st.edits[t.id]);e.date=date;setSpan(e,a,b);st.edits[t.id]=e}}
@@ -1626,14 +1676,16 @@ function putSpan(st,t,date,a,b){ // move task t (in plan state st) to date + [a,
 function openTask(id){const t=ALL.find(x=>x.id===id);if(!t||t.k==='rest')return;
   const S=SUBJ[t.s],done=!!state.done[id],base=baseOf(id),timed=t.ap&&t.e;
   const sv=timed?hm(startMin(t)):'',ev=timed?hm(endMin(t)%1440):'';
-  const from=t.date<TODAY?TODAY:t.date;
-  const quick=[['අද',TODAY],['හෙට',isoAdd(TODAY,1)],['ඊළඟ '+sName(t.s)+' දවස',targetDate(t,'same',from)],['ඉරිදා',targetDate(t,'sun',from)]].filter(q=>q[1]&&q[1]<=END&&q[1]>=START);
+  const from=t.date<TODAY?isoAdd(TODAY,-1):t.date;
+  const sl=(m)=>targetSlot(t,m,from),qs=[['අද',TODAY,null],['හෙට',isoAdd(TODAY,1),null]];
+  {const a=targetSlot(t,'same',from,PLAN,true);if(a)qs.push(['ඊළඟ '+sName(t.s)+' දවස',a.d,a]);const b=sl('buf');if(b)qs.push(['Buffer',b.d,b])}
+  const quick=qs.filter(q=>q[1]&&q[1]<=END&&q[1]>=START);
   const changedBase=!t.cu&&(state.edits[id]||state.hidden[id]);
   const sh=openSheet({title:'වැඩේ විස්තර',c:S.c,c2:S.c2,
     body:`<div class="sh-top"><span class="tpill">${S.n}</span><span class="kind ${t.k==='old'?'old':''}">${KIND[t.k]||''}</span>${t.cu?'<span class="bdg cu">මම add කළා</span>':''}${t.mv?'<span class="bdg mv">මාරු කළා</span>':''}</div>
     <div class="fld"><label for="tsT">වැඩේ නම</label><input class="inp" id="tsT" value="${esc(t.ti)}" maxlength="140"></div>
     <div class="fld"><label for="tsD">දවස</label><input class="inp" type="date" id="tsD" value="${t.date}" min="${START}" max="${END}">
-      <div class="quick" id="tsQ">${quick.map(q=>`<button class="chp sm" data-d="${q[1]}">${q[0]} <small class="mono">${fmt(q[1])}</small></button>`).join('')}</div></div>
+      <div class="quick" id="tsQ">${quick.map(q=>`<button class="chp sm" data-d="${q[1]}" ${q[2]&&q[2].ok?`data-a="${q[2].a}" data-b="${q[2].b}"`:''}>${q[0]} <small class="mono">${fmt(q[1])}</small></button>`).join('')}</div></div>
     <div class="row2"><div class="fld"><label for="tsS">පටන් ගන්න</label><input class="inp" type="time" id="tsS" value="${sv}"></div>
       <div class="fld"><label for="tsE">ඉවර වෙන්න</label><input class="inp" type="time" id="tsE" value="${ev}"></div></div>
     <div class="hint" id="tsH"></div>
@@ -1645,11 +1697,13 @@ function openTask(id){const t=ALL.find(x=>x.id===id);if(!t||t.k==='rest')return;
       <button class="btn sm dng" data-ts="del">${IC.trash}ඉවත් කරන්න</button></div>`,
     foot:`${t.fx?'':`<button class="btn ${done?'':'ok'} grow" data-ts="done">${IC.check}${done?'ආයේ ඉවර නෑ':'ඉවරයි'}</button>`}<button class="btn pri grow" data-ts="save">${IC.check}Save</button>`});
   const q=n=>sh.querySelector(n),D=q('#tsD'),Si=q('#tsS'),Ei=q('#tsE'),H=q('#tsH');
-  const hint=()=>{if(!Si.value||!Ei.value){H.innerHTML='';return}const a=toMin(Si.value),b=toMin(Ei.value);
-    if(b<=a){H.innerHTML='<span class="warn-t">ඉවර වෙන වෙලාව පටන් ගන්න වෙලාවට පස්සේ වෙන්න ඕන.</span>';return}
+  const hint=()=>{if(!Si.value||!Ei.value){H.innerHTML='';return}const sp=spanOf(Si.value,Ei.value);
+    if(!sp){H.innerHTML='<span class="warn-t">ඉවර වෙන වෙලාව පටන් ගන්න වෙලාවට පස්සේ වෙන්න ඕන.</span>';return}const [a,b]=sp;
     const c=clashWith(id,D.value,a,b);H.innerHTML=c?`<span class="warn-t">⚠ ${shortT(startMin(c))} · ${esc(c.ti)} එක්ක ගැටෙනවා. ඒත් save කරන්න පුළුවන්.</span>`:`පැය ${Math.round((b-a)/6)/10}ක් · ${DAYS[dow(D.value)]}`};
   [D,Si,Ei].forEach(x=>x.addEventListener('input',hint));hint();
   q('#tsQ').addEventListener('click',e=>{const b=e.target.closest('[data-d]');if(!b)return;D.value=b.dataset.d;vib(6);
+    if(b.dataset.a){Si.value=hm(+b.dataset.a);Ei.value=hm(+b.dataset.b%1440)}
+    else{const sp=spanOf(Si.value,Ei.value);if(sp&&clashWith(id,D.value,sp[0],sp[1])){const g=gapIn(D.value,sp[1]-sp[0],PLAN,id);if(g.ok){Si.value=hm(g.a);Ei.value=hm(g.b%1440)}}}
     q('#tsQ').querySelectorAll('.chp').forEach(x=>x.setAttribute('aria-pressed',x===b));hint()});
   let nt=null;const N=q('#tsN');N.addEventListener('input',()=>{clearTimeout(nt);nt=setTimeout(()=>{const v=N.value.trim();if(v)state.notes[id]=v;else delete state.notes[id];changed(false);
     const sv2=q('#tsSaved');if(sv2){sv2.textContent='· සුරැකුණා ✓';setTimeout(()=>{if(sv2)sv2.textContent=''},1500)}},450)});
@@ -1665,7 +1719,7 @@ function openTask(id){const t=ALL.find(x=>x.id===id);if(!t||t.k==='rest')return;
       if(!title){shake(q('#tsT'));q('#tsT').focus();return}
       if(!date||date<START||date>END){shake(D);return}
       let span=null;
-      if(Si.value||Ei.value){if(!(Si.value&&Ei.value)){shake(Si.value?Ei:Si);return}const a=toMin(Si.value),bb=toMin(Ei.value);if(bb<=a){shake(Ei);return}span=[a,bb]}
+      if(Si.value||Ei.value){if(!(Si.value&&Ei.value)){shake(Si.value?Ei:Si);return}span=spanOf(Si.value,Ei.value);if(!span){shake(Ei);return}}
       const j=snapPlan(),oldDate=t.date;
       if(t.cu){const c=state.custom.find(x=>x.id===id);c.ti=title;c.date=date;if(span)setSpan(c,span[0],span[1])}
       else{const e=Object.assign({},state.edits[id]),b0=base;
@@ -1682,7 +1736,7 @@ function openTask(id){const t=ALL.find(x=>x.id===id);if(!t||t.k==='rest')return;
 
 /* ---------- add task ---------- */
 function openAdd(date){date=date||ui.sel;if(date<START)date=START;if(date>END)date=END;
-  let subj='sft';const day=dayKey(date)[1];if(SUBJ[day]&&['sft','et','ict'].includes(day))subj=day;else if(day==='dip')subj='asg';
+  let subj='sft';const day=dayKey(date)[1];if(['sft','et','ict','dip','hex'].includes(day))subj=day;else if(day==='mix')subj=dow(date)===5?'ict':'sft';
   const g=gapIn(date,60);
   const S=()=>SUBJ[subj];
   const sh=openSheet({title:'අලුත් වැඩක් add කරන්න',c:S().c,c2:S().c2,
@@ -1690,20 +1744,20 @@ function openAdd(date){date=date||ui.sel;if(date<START)date=START;if(date>END)da
     <div class="fld"><label for="adT">වැඩේ නම</label><input class="inp" id="adT" placeholder="උදා: Unit 03 notes ඉවර කරන්න" maxlength="140"></div>
     <div class="fld"><label for="adD">දවස</label><input class="inp" type="date" id="adD" value="${date}" min="${START}" max="${END}"></div>
     <div class="row2"><div class="fld"><label for="adS1">පටන් ගන්න</label><input class="inp" type="time" id="adS1" value="${hm(g.a)}"></div>
-      <div class="fld"><label for="adE1">ඉවර වෙන්න</label><input class="inp" type="time" id="adE1" value="${hm(g.b)}"></div></div>
+      <div class="fld"><label for="adE1">ඉවර වෙන්න</label><input class="inp" type="time" id="adE1" value="${hm(g.b%1440)}"></div></div>
     <div class="hint" id="adH">${g.ok?'හිස් වෙලාවක් තෝරලා දුන්නා. ඕන නම් වෙනස් කරන්න.':'<span class="warn-t">ඒ දවසේ හිස් වෙලාවක් නෑ. වෙලාව බලලා වෙනස් කරන්න.</span>'}</div>`,
     foot:`<button class="btn pri grow" data-ad="save">${IC.plus}Add කරන්න</button>`});
   const q=n=>sh.querySelector(n),D=q('#adD'),Si=q('#adS1'),Ei=q('#adE1'),H=q('#adH');
   bindChips(q('#adS'),'data-s',k=>{subj=k;sh.style.setProperty('--c',S().c);sh.style.setProperty('--c2',S().c2)});
-  const hint=()=>{if(!Si.value||!Ei.value)return;const a=toMin(Si.value),b=toMin(Ei.value);if(b<=a){H.innerHTML='<span class="warn-t">ඉවර වෙන වෙලාව පස්සේ වෙන්න ඕන.</span>';return}
+  const hint=()=>{if(!Si.value||!Ei.value)return;const sp=spanOf(Si.value,Ei.value);if(!sp){H.innerHTML='<span class="warn-t">ඉවර වෙන වෙලාව පස්සේ වෙන්න ඕන.</span>';return}const [a,b]=sp;
     const c=clashWith('',D.value,a,b);H.innerHTML=c?`<span class="warn-t">⚠ ${shortT(startMin(c))} · ${esc(c.ti)} එක්ක ගැටෙනවා.</span>`:'මේ වෙලාව හිස්.'};
-  D.addEventListener('input',()=>{if(D.value>=START&&D.value<=END){const g2=gapIn(D.value,Math.max(15,toMin(Ei.value)-toMin(Si.value)||60));Si.value=hm(g2.a);Ei.value=hm(g2.b)}hint()});
+  D.addEventListener('input',()=>{if(D.value>=START&&D.value<=END){const sp=spanOf(Si.value,Ei.value);const g2=gapIn(D.value,sp?sp[1]-sp[0]:60);Si.value=hm(g2.a);Ei.value=hm(g2.b%1440)}hint()});
   Si.addEventListener('input',hint);Ei.addEventListener('input',hint);
   q('[data-ad="save"]').addEventListener('click',()=>{const title=q('#adT').value.trim();
     if(!title){shake(q('#adT'));q('#adT').focus();return}
     const d=D.value;if(!d||d<START||d>END){shake(D);return}
-    if(!Si.value||!Ei.value||toMin(Ei.value)<=toMin(Si.value)){shake(Ei);return}
-    const c={id:uid('c-'),date:d,s:subj,ti:title,k:'now'};setSpan(c,toMin(Si.value),toMin(Ei.value));
+    const sp=spanOf(Si.value,Ei.value);if(!sp){shake(Ei);return}
+    const c={id:uid('c-'),date:d,s:subj,ti:title,k:'now'};setSpan(c,sp[0],sp[1]);
     const j=snapPlan();state.custom.push(c);changed(true);closeSheet();
     if(ui.tab==='today'&&ui.sel!==d)goDay(d);else render(true);
     toast('වැඩේ add කළා',`${fmt(d)} · ${shortT(toMin(Si.value))} · ${title}`,'＋',{undo:()=>restorePlan(j)});vib([10,30,16]);highlight(c.id)});
@@ -1713,26 +1767,25 @@ function openAdd(date){date=date||ui.sel;if(date<START)date=START;if(date>END)da
 function openSkip(iso){const P=PLAN[iso];if(!P)return;
   const open=P.tasks.filter(t=>!t.fx&&t.k!=='rest'&&!state.done[t.id]);
   if(!open.length){toast('වැඩ ඔක්කොම ඉවරයි 🎉','මාරු කරන්න දෙයක් නෑ.','✅');return}
-  const sel=new Set(open.filter(t=>t.k!=='daily').map(t=>t.id));let mode='same';
+  const sel=new Set(open.filter(t=>t.k!=='daily').map(t=>t.id));let mode='buf';
+  const from=iso<TODAY?isoAdd(TODAY,-1):iso; // missed days: today is the earliest place to put things
   const plan=()=>{const tmp=normState(JSON.parse(JSON.stringify(state)));const out=[];let r=makePlan(tmp);
-    for(const t0 of open){if(!sel.has(t0.id))continue;const t=r.ALL.find(x=>x.id===t0.id);const d=targetDate(t,mode,iso);
-      if(!d){out.push({t,d:null});continue}
-      const dur=Math.min(90,Math.max(30,Math.round((t.h||1)*60/15)*15));const g=gapIn(d,dur,r.PLAN);
-      putSpan(tmp,t,d,g.a,g.b);r=makePlan(tmp);out.push({t,d,a:g.a,b:g.b,ok:g.ok})}
+    for(const t0 of open){if(!sel.has(t0.id))continue;const t=r.ALL.find(x=>x.id===t0.id);const g=targetSlot(t,mode,from,r.PLAN);
+      if(!g){out.push({t,d:null});continue}
+      putSpan(tmp,t,g.d,g.a,g.b);r=makePlan(tmp);out.push({t,d:g.d,a:g.a,b:g.b,ok:g.ok,short:g.short})}
     return {out,tmp}};
-  const label={same:'ඊළඟ ඒ subject දවසට',sun:'ඉරිදා buffer එකට',next:'හෙට දවසට'};
   const sh=openSheet({title:iso<TODAY?'මඟ ඇරුණු වැඩ මාරු කරන්න':'අද කරන්න බැරි වුණා',c:'var(--warn)',c2:'#F97316',
     body:`<p class="hint" style="margin:0">ඉවර නොවුණු වැඩ ${open.length}ක් තියෙනවා. මාරු කරන්න ඕන ඒවා තෝරන්න. හිස් වෙලාවක් බලලා තමන්ම දාලා දෙනවා.</p>
     <div class="skl" id="skL"></div>
     <div class="fld"><label>කොහාටද මාරු කරන්නේ?</label><div class="skl" id="skM">
-      <button class="opt" data-m="same" aria-pressed="true"><span class="rd"></span><span><b>ඊළඟ ඒ subject දවසට</b><small>උදා: SFT වැඩක් නම් ඊළඟ SFT දවසට. Hexora/assignments වැඩ ඉරිදාට.</small></span></button>
-      <button class="opt" data-m="sun" aria-pressed="false"><span class="rd"></span><span><b>ඉරිදා buffer එකට</b><small>සතියේ ඉරිදා හිස් වෙලා තියෙන තැනට.</small></span></button>
+      <button class="opt" data-m="buf" aria-pressed="true"><span class="rd"></span><span><b>සිකුරාදා buffer එකට</b><small>ප.ව. 2–5 buffer එකට. ඒක පිරිලා නම් සෙනසුරාදා 5:45–8 හිස් වෙලාවට, නැත්නම් ඊළඟ සතියේ buffer එකට.</small></span></button>
+      <button class="opt" data-m="same" aria-pressed="false"><span class="rd"></span><span><b>ඊළඟ ඒ subject දවසට</b><small>ඒ දවසේ හිස් වෙලාවක් තියෙනවා නම් විතරක්. නැත්නම් buffer එකට.</small></span></button>
       <button class="opt" data-m="next" aria-pressed="false"><span class="rd"></span><span><b>හෙට දවසට</b><small>හෙට දවසේ හිස් වෙලාවක්.</small></span></button></div></div>`,
     foot:`<button class="btn grow" data-sk="cancel">අවලංගුයි</button><button class="btn pri grow" id="skGo" data-sk="go">${IC.skip}<span>මාරු කරන්න</span></button>`});
   const L=sh.querySelector('#skL'),go=sh.querySelector('#skGo');
   const draw=()=>{const {out}=plan();const map=new Map(out.map(o=>[o.t.id,o]));
     L.innerHTML=open.map(t=>{const S=SUBJ[t.s],on=sel.has(t.id),o=map.get(t.id);
-      const to=on?(o&&o.d?`${fmt(o.d)} ${DSH[dow(o.d)]} · ${shortT(o.a)}${o.ok?'':' ⚠'}`:'දවසක් නෑ'):'';
+      const to=on?(o&&o.d?`${fmt(o.d)} ${DSH[dow(o.d)]} · ${shortT(o.a)}${o.short?' · පැය '+Math.round((o.b-o.a)/6)/10+'යි':''}${o.ok?'':' ⚠'}`:'දවසක් නෑ'):'';
       return `<button class="skr" data-i="${t.id}" aria-pressed="${on}" style="--c:${S.c}"><span class="ck">${IC.check}</span>
         <span class="sx">${esc(t.ti)}<small>${S.n} · ${t.t}${t.e?' – '+t.e:''}</small></span><span class="to">${to}</span></button>`}).join('');
     const n=out.filter(o=>o.d).length;go.disabled=!n;go.querySelector('span').textContent=n?`මාරු කරන්න · ${n}`:'මාරු කරන්න';
@@ -1873,7 +1926,7 @@ if(FT.run||ftLeft()<FT.dur){setTimeout(()=>{if(FT.run&&ftLeft()<=0)ftFinish();el
 /* =====================================================================
    MCQ SCORES
    ===================================================================== */
-const UNITS={sft:['Unit 01','Unit 02','Unit 03','Unit 04','Mixed'],et:['Unit 01','Unit 02','Unit 03','Unit 04','Unit 05','Unit 06','Mixed'],ict:['Unit 01','Unit 02','Unit 03','Unit 04','Class MCQ','Day paper','Mixed']};
+const UNITS={sft:['Unit 01','Unit 02','Unit 03','Unit 04','Mixed'],et:['Unit 01','Unit 02','Unit 03','Unit 04','Unit 05','Unit 06','Mixed'],ict:['Unit 01','Unit 02','Unit 03','Unit 04','Day paper','Daily quiz','Mixed']};
 const pcCol=p=>p>=70?'var(--ok)':p>=50?'#F59E0B':'var(--warn)';
 function openScore(pre){pre=pre||{};let s=UNITS[pre.s]?pre.s:'ict',u=UNITS[s][0],c=0,n=20;
   const lastN=()=>{const l=state.scores.filter(x=>x.s===s).slice(-1)[0];return l?l.n:(s==='ict'?10:20)};n=lastN();
@@ -1966,7 +2019,7 @@ function viewTools(){
   const running=FT.run||ftLeft()<FT.dur;
   const focusCard=`<section class="card tcard stag" style="--i:0;--c:var(--accent);--c2:var(--accent2)"><div class="th"><span class="ico">${IC.focus}</span><div><h3>Focus timer</h3><small>Pomodoro · ${st.fm} මිනි focus + ${st.sb} මිනි break</small></div>
       <button class="btn pri sm" data-act="focus">${running?'දිගටම':'පටන් ගන්න'}</button></div>
-    <div class="fbig">${ringSVG('focus','big')}<div><p>අද focus <b>${fmtMin(fToday)}</b><br>ඉලක්කය පැය 2යි.</p>
+    <div class="fbig">${ringSVG('focus','big')}<div><p>අද focus <b>${fmtMin(fToday)}</b><br>ඉලක්කය පැය 4යි.</p>
       ${nextTasks.length?`<div class="chips">${nextTasks.map(t=>`<button class="chp sm" data-act="focus" data-tid="${t.id}" style="--c:${SUBJ[t.s].c};--c2:${SUBJ[t.s].c2}" aria-pressed="false">${esc(t.ti.length>22?t.ti.slice(0,22)+'…':t.ti)}</button>`).join('')}</div>`:''}</div></div>
     ${frows?`<div class="hours" style="margin-top:14px"><div class="lab" style="margin-bottom:2px">මේ සතියේ subject අනුව</div>${frows}</div>`:`<p class="hint" style="margin:12px 0 0">Focus කරපු වෙලාව subject එක අනුව මෙතන පේනවා.</p>`}</section>`;
   const ex=st.exam,dEx=ex?diff(today,ex):null;
@@ -1974,7 +2027,7 @@ function viewTools(){
   const cdCard=`<section class="card tcard stag" style="--i:1;--c:var(--dip);--c2:var(--hex)"><div class="th"><span class="ico" style="--c:var(--dip);--c2:var(--hex)">${IC.cal}</span><div><h3>A/L විභාගය</h3><small>${ex?'ඉතුරු කාලය':'විභාග දිනය දාන්න'}</small></div></div>
     ${ex&&dEx>=0?`<div class="cd"><div class="num" data-cnt="${dEx}">0</div><div class="lbl"><b>දවස් ඉතුරුයි</b>සති ${Math.floor(dEx/7)}යි දවස් ${dEx%7}යි · ${fmtLong(ex)}</div></div><div class="cdbar"><i data-w="${exPct}"></i></div>`
       :ex?`<div class="empty">විභාගය ඉවරයි. සුබ පැතුම්! 🎉</div>`:`<p class="hint" style="margin:0 0 4px">නිල දිනය තවම නැත්නම් පස්සේ දාන්න. දාපු ගමන් ඉතුරු දවස් "ප්‍රගතිය" tab එකේ deadlines වලත් පේනවා.</p>`}
-    <div class="fld" style="margin-top:12px"><label for="examD">විභාග පටන් ගන්න දවස</label><input class="inp" type="date" id="examD" value="${ex||''}" min="${START}" max="2027-12-31"></div></section>`;
+    <div class="fld" style="margin-top:12px"><label for="examD">විභාග පටන් ගන්න දවස</label><input class="inp" type="date" id="examD" value="${ex||''}" min="${START}" max="2029-12-31"></div></section>`;
   const al=PWA.on;
   const alertCard=`<section class="card tcard stag" style="--i:4;--c:var(--sft);--c2:var(--sft2)"><div class="th"><span class="ico" style="--c:var(--sft);--c2:var(--sft2)">${IC.bell}</span><div><h3>Alerts</h3><small>${PWA.supported?(al?'Phone එකට alerts එනවා':'Off · on කරන්න'):'Install කරපු app එකේ විතරයි'}</small></div></div>
     ${PWA.supported?`<div class="setrow"><div><b>වැඩ වලට කලින් alert</b><small>Phone එක lock වෙලා තිබුණත් එනවා.</small></div>${toggleHTML('push',al)}</div>`
@@ -1982,8 +2035,8 @@ function viewTools(){
     <div class="fld" style="margin:6px 0 4px"><label>කොච්චර කලින්ද?</label>${segHTML([[5,'මිනි 5'],[10,'මිනි 10'],[15,'මිනි 15']],st.lead,'lead')}</div>
     <div class="setrow"><div><b>පන්ති විතරක්</b><small>Class එකට විතරක් alert. අනිත් වැඩ වලට නෑ.</small></div>${toggleHTML('cls',st.cls)}</div>
     <div class="setrow"><div><b>විවේක / කෑම වෙලාවටත්</b><small>Off නම් විවේක වෙලාවට alert එන්නේ නෑ.</small></div>${toggleHTML('rest',st.rest)}</div>
-    <div class="setrow"><div><b>උදේ 6:30 summary</b><small>අද දවසේ වැඩ, පළමු වැඩේ, streak.</small></div>${toggleHTML('am',st.am)}</div>
-    <div class="setrow"><div><b>රෑ 11:45 summary</b><small>අද ඉවර කළ ගාන සහ හෙට පළමු වැඩේ.</small></div>${toggleHTML('pm',st.pm)}</div></section>`;
+    <div class="setrow"><div><b>උදේ summary</b><small>8:40ට (සෙනසුරාදා 6:40ට, ET පන්තිය නිසා). අද වැඩ, පළමු වැඩේ, streak.</small></div>${toggleHTML('am',st.am)}</div>
+    <div class="setrow"><div><b>රෑ 11:45 summary</b><small>අද ඉවර කළ ගාන සහ හෙට පළමු වැඩේ (නිදාගන්න කලින්).</small></div>${toggleHTML('pm',st.pm)}</div></section>`;
   const icsCard=`<section class="card tcard stag" style="--i:5;--c:var(--et);--c2:var(--et2)"><div class="th"><span class="ico" style="--c:var(--et);--c2:var(--et2)">${IC.cal}</span><div><h3>Calendar එකට</h3><small>Google Calendar / Apple / Outlook</small></div></div>
     <div class="fld"><label>මොන කාලයද?</label>${segHTML([['week','මේ සතිය'],['rest','ඉතුරු plan එක'],['all','ඔක්කොම']],ICS.range==='rest'?'rest':ICS.range,'icsr')}</div>
     <div class="setrow"><div><b>ඉවර කරපු ඒවා නැතිව</b><small>Tick කරපු වැඩ file එකට දාන්නේ නෑ.</small></div>${toggleHTML('icsd',ICS.hideDone)}</div>
@@ -2088,7 +2141,7 @@ PWA.supported=pushOK||isIOS;PWA.on=alertsOn;
 function paintBell(){PWA.on=alertsOn;bell.classList.toggle('on',alertsOn);bell.setAttribute('aria-pressed',alertsOn);bell.setAttribute('aria-label',alertsOn?'Alerts on — off කරන්න':'Alerts on කරන්න');
   document.querySelectorAll('[data-k="push"]').forEach(t=>t.setAttribute('aria-checked',alertsOn))}
 const b64=s=>{const p='='.repeat((4-s.length%4)%4);const r=atob((s+p).replace(/-/g,'+').replace(/_/g,'/'));return Uint8Array.from([...r].map(c=>c.charCodeAt(0)))};
-const cfg=()=>({done:Object.keys(state.done),edits:state.edits,hidden:state.hidden,custom:state.custom,settings:state.settings,qs:state.qs.filter(q=>!q.done).map(q=>({s:q.s}))});
+const cfg=()=>({pv:PLAN_V,done:Object.keys(state.done),edits:state.edits,hidden:state.hidden,custom:state.custom,settings:state.settings,qs:state.qs.filter(q=>!q.done).map(q=>({s:q.s}))});
 async function api(method,body){const r=await fetch('/api/push',{method,headers:{'content-type':'application/json'},body:JSON.stringify(body)});let j={};try{j=await r.json()}catch(e){}if(!r.ok)throw new Error(j.error||('HTTP '+r.status));return j}
 async function enableAlerts(){
   if(isIOS&&!standalone){toast('ඉස්සෙල්ලා install කරන්න','iPhone එකේ alerts එන්නේ app එක Home Screen එකට add කළාම විතරයි. Share → Add to Home Screen.','📲');paintBell();return}

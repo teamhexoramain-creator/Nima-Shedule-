@@ -1,8 +1,8 @@
 /* Runs every minute (UTC cron). For every phone with alerts on: task alerts (lead time from its settings),
-   plus the 6:30 am and 11 pm summaries. Uses that phone's own edits / moved / added tasks. */
+   plus the morning (8:40, earlier on Saturdays) and 11:45 pm summaries. Uses that phone's own edits / moved / added tasks. */
 import { getStore } from '@netlify/blobs';
 import webpush from 'web-push';
-import { dueTasks, payloadFor, planOf, settingsOf, summaryDue, summaryPayload, colomboDate, dedupeKey } from '../lib/reminders.mjs';
+import { dueTasks, payloadFor, planOf, doneOf, settingsOf, summaryDue, summaryPayload, colomboDate, dedupeKey } from '../lib/reminders.mjs';
 import { getVapid, subject } from '../lib/vapid.mjs';
 
 export default async () => {
@@ -21,7 +21,7 @@ export default async () => {
     const set = settingsOf(rec);
     let PLAN;
     try { PLAN = planOf(rec); } catch (e) { console.error('plan failed', id, e); continue; }
-    const done = new Set(rec.done || []);
+    const done = doneOf(rec);
     const sentSet = new Set((await store.get(`sent/${id}`, { type: 'json' })) || []);
     const jobs = [];
 
@@ -30,7 +30,7 @@ export default async () => {
       if (done.has(item.task.id) || sentSet.has(dk)) continue;
       jobs.push({ dk, payload: payloadFor(item), ttl: 600 });
     }
-    const kind = summaryDue(now, set);
+    const kind = summaryDue(now, set, PLAN);
     if (kind) {
       const dk = `sum:${kind}:${today}`;
       if (!sentSet.has(dk)) jobs.push({ dk, payload: summaryPayload(kind, now, PLAN, rec), ttl: 3600 });
